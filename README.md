@@ -7,6 +7,6 @@ the Parse JavaScript SDK.
 Features:
 
 * ParseAdapter: Ember Data Adapter
-** Implements the minimum required Adapter functionality
+  * Implements the minimum required Adapter functionality
 * ParseMixin: Ember Mixin
-** Provides primary key and created/updated date attributes.
+  * Provides primary key and created/updated date attributes.
