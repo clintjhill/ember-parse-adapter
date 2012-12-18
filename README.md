@@ -10,11 +10,20 @@ Features
 --------
 
 * ParseAdapter: Ember Data Adapter
-  * Implements the minimum required Adapter functionality
+  * Implements the minimum required Adapter functionality.
 * ParseMixin: Ember Mixin
   * Provides primary key and created/updated date attributes.
+
+Issues
+------
+
+* Translation from 'objectId' to 'id' isn't as clean as it could be.
+* Performance improvements could be made for Associtations.
+* Incomplete example.
 
 Roadmap
 -------
 
-* Implement findQuery
+* Implement findQuery.
+* Expose more Parse info inside the ParseMixin.
+* Transition to a completely Ember based implementation dropping the Backbone.
