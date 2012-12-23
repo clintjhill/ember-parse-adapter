@@ -27,3 +27,9 @@ Roadmap
 * Implement findQuery.
 * Expose more Parse info inside the ParseMixin.
 * Transition to a completely Ember based implementation dropping the Backbone.
+
+Dev Notes
+---------
+
+* Tagging is formatted as 'vX.X.X' v.X.X.X
+* 
