@@ -1,8 +1,7 @@
 Ember.js Data Adapter for Parse
 ===================
 
-An Ember.js Data Adapter built to map Parse objects to Ember objects through
-the Parse JavaScript SDK. 
+An Ember.js Data Adapter built to use the Parse REST API. 
 
 Currently in a very alpha state. 
 
@@ -15,6 +14,10 @@ shouldn't be using this project yet anyways. In fact you should be forking and f
 Features
 --------
 
+* ParseConnector: Ember Mixin
+  * Provides the AJAX connectivity to the Parse REST API.
+* ParseConnector.JSONTransforms: Ember Data JSONTranforms
+  * Provides Date transforms for ISO Dates in Parse.
 * ParseAdapter: Ember Data Adapter
   * Implements the minimum required Adapter functionality.
 * ParseMixin: Ember Mixin
@@ -24,18 +27,20 @@ Issues
 ------
 
 * Translation from 'objectId' to 'id' isn't as clean as it could be.
-* Performance improvements could be made for Associtations.
+* Update/Delete has adapter error due to non-congruent data returned from Parse.
 * Incomplete example.
+* Demo is rough due to Parse acct dependency.
 
 Roadmap
 -------
 
 * Implement findQuery.
+* Implement findMany.
+* Implement Store recordWasError et al in error conditions.
+* Implement full type encodings supported by Parse.
 * Expose more Parse info inside the ParseMixin.
-* Transition to a completely Ember based implementation dropping the Backbone.
 
 Dev Notes
 ---------
 
 * Tagging is formatted as 'vX.X.X' v.X.X.X
-* 

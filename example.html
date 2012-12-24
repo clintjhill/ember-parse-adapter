@@ -19,20 +19,18 @@
 <!-- Example application -->
 <script>
 
-  /* Initialize Parse
-    Note: provide your own Parse acct ID's here to test the example.
-  */
-  var yourParseAppID = '',
-    yourParseJSID = '';
-  Parse.initialize(yourParseAppID, yourParseJSID);
-  
   // Create an Ember application
   var ExampleApp = Ember.Application.create();
 
   // Add a Data Store to the application that implements a Parse Adapter
+  // Be sure to provide your Parse Acct IDs to initialize the connection.
   ExampleApp.Store = DS.Store.create({
     revision: 10,
-    adapter: ParseAdapter.create()
+    adapter: ParseAdapter.create({
+      applicationId: 'yourAppId',
+      restApiId: 'yourRESTId',
+      javascriptId: 'yourJSId'
+    })
   });
 
   /* 
@@ -50,7 +48,7 @@
   
   // if you wish to not use the name 'SampleModel' set it with parseType
   ExampleApp.SampleModel.reopenClass({
-    parseType: 'Sample',
+    parseType: 'Sample'
   });
 
   ExampleApp.initialize();
