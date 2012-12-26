@@ -6,9 +6,8 @@ An Ember.js Data Adapter built to use the Parse REST API.
 This branch is a full Ember implementation against the Parse REST API without the use
 of the Parse JavaScript SDK. Currently in a very alpha state. 
 
-At the moment this performs only the simple CRUD features. As well it contains a few 
-incomplete DS.Store administrivia such as reconciling the REST data result with client
-data. However the implementation does drop the core of the Parse JavaScript SDK.
+At the moment this performs only the simple CRUD features. However the implementation 
+does drop the core of the Parse JavaScript SDK.
 
 This is a CORS implementation. It has nuances. As an example Parse REST API only responds
 to SSL requests. Due to IE8+ CORS implementations that means you must run your app under SSL. As well
