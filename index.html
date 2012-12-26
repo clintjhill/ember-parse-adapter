@@ -34,10 +34,8 @@
 
 <p>An Ember Data Adapter built to use the Parse REST API. </p>
 
-<p>This branch is a full Ember implementation against the Parse REST API without the use
-of the Parse JavaScript SDK. Currently in a very alpha state. </p>
-
-<p>At the moment this performs only the simple CRUD features. However the implementation 
+<p>This is a full Ember implementation against the Parse REST API without the use
+of the Parse JavaScript SDK. Currently in a very alpha state. At the moment this performs only the simple CRUD features. However the implementation 
 does drop the core of the Parse JavaScript SDK.</p>
 
 <p>This is a CORS implementation. It has nuances. As an example Parse REST API only responds
@@ -47,7 +45,7 @@ some browsers will perform an OPTIONS call along-side the regular GET/PUT/POST/D
 and then use jQuery for all other supporting browsers. This might be a dead-end and I might
 be wiser to use Parse's full XHR implementation (it's small and smart - but I'm trying to be original).</p>
 
-<p>The branch currently works with the Ember versions listed in the example.html AS-IS. 
+<p>Currently works with the Ember versions listed in the example.html AS-IS. 
 The example is using the master branch of Ember and Ember-Data (built for this project). 
 There is also 1 modification done here locally to flip a guard for Ember.BOOTED inside 
 ember-latest.js (line: 5495). I apologize for this kind of kludgery. I dislike it myself. 
@@ -56,37 +54,26 @@ In fact you should be forking and fixing. Thanks!</p>
 
 <h2>Features</h2>
 
-<ul>
-<li>ParseConnector: Ember Mixin
+<h5>ParseConnector: Ember Mixin</h5>
 
 <ul>
 <li>Provides the AJAX connectivity to the Parse REST API.</li>
-</ul>
-</li>
-<li>ParseJSONSerializer: Ember Data JSONSerializer
+</ul><h5>ParseJSONSerializer: Ember Data JSONSerializer</h5>
 
 <ul>
 <li>Provides the translation of objectId to id.</li>
-</ul>
-</li>
-<li>ParseJSONTransforms: Ember Data JSONTranforms
+</ul><h5>ParseJSONTransforms: Ember Data JSONTranforms</h5>
 
 <ul>
 <li>Provides Date transforms for ISO Dates in Parse.</li>
-</ul>
-</li>
-<li>ParseAdapter: Ember Data Adapter
+</ul><h5>ParseAdapter: Ember Data Adapter</h5>
 
 <ul>
 <li>Implements the minimum required Adapter CRUD functionality.</li>
-</ul>
-</li>
-<li>ParseMixin: Ember Mixin
+</ul><h5>ParseMixin: Ember Mixin</h5>
 
 <ul>
 <li>Provides created/updated date attributes.</li>
-</ul>
-</li>
 </ul><h2>Issues</h2>
 
 <ul>
