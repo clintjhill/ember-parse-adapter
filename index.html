@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Ember Parse Adapter by clintjhill</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Ember Parse Adapter</h1>
+        <p class="header">An Ember.js Data Adapter for Parse</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/clintjhill/ember-parse-adapter/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/clintjhill/ember-parse-adapter/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/clintjhill/ember-parse-adapter">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/clintjhill">clintjhill</a></p>
+
+
+      </header>
+      <section>
+        <h1>Ember.js Data Adapter for Parse</h1>
+
+<p>An Ember.js Data Adapter built to use the Parse REST API. </p>
+
+<p>This branch is a full Ember implementation against the Parse REST API without the use
+of the Parse JavaScript SDK. Currently in a very alpha state. </p>
+
+<p>At the moment this performs only the simple CRUD features. However the implementation 
+does drop the core of the Parse JavaScript SDK.</p>
+
+<p>This is a CORS implementation. It has nuances. As an example Parse REST API only responds
+to SSL requests. Due to IE8+ CORS implementations that means you must run your app under SSL. As well
+some browsers will perform an OPTIONS call along-side the regular GET/PUT/POST/DELETE 
+(still investigating all of this - and learning). I chose to re-use the Parse XDomainRequest implementation
+and then use jQuery for all other supporting browsers. This might be a dead-end and I might
+be wiser to use Parse's full XHR implementation (it's small and smart - but I'm trying to be original).</p>
+
+<p>The branch currently works with the Ember versions listed in the example.html AS-IS. 
+The example is using the master branch of Ember and Ember-Data (built for this project). 
+There is also 1 modification done here locally to flip a guard for Ember.BOOTED inside 
+ember-latest.js (line: 5495). I apologize for this kind of kludgery. I dislike it myself. 
+But understand this is temporary and you really shouldn't be using this project yet anyways. 
+In fact you should be forking and fixing. Thanks!</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>ParseConnector: Ember Mixin
+
+<ul>
+<li>Provides the AJAX connectivity to the Parse REST API.</li>
+</ul>
+</li>
+<li>ParseJSONSerializer: Ember Data JSONSerializer
+
+<ul>
+<li>Provides the translation of objectId to id.</li>
+</ul>
+</li>
+<li>ParseJSONTransforms: Ember Data JSONTranforms
+
+<ul>
+<li>Provides Date transforms for ISO Dates in Parse.</li>
+</ul>
+</li>
+<li>ParseAdapter: Ember Data Adapter
+
+<ul>
+<li>Implements the minimum required Adapter CRUD functionality.</li>
+</ul>
+</li>
+<li>ParseMixin: Ember Mixin
+
+<ul>
+<li>Provides created/updated date attributes.</li>
+</ul>
+</li>
+</ul><h2>Issues</h2>
+
+<ul>
+<li>Incomplete example.</li>
+<li>Demo is rough due to Parse acct dependency.</li>
+</ul><h2>Roadmap</h2>
+
+<ul>
+<li>Implement findQuery.</li>
+<li>Implement findMany.</li>
+<li>Implement Store recordWasError et al in error conditions.</li>
+<li>Implement full type encodings supported by Parse.</li>
+<li>Expose more Parse info inside the ParseMixin.</li>
+</ul><h2>Dev Notes</h2>
+
+<ul>
+<li>To get a build simply grunt. You'll find builds inside the /dist folder.</li>
+<li>Tagging is formatted as 'vX.X.X' v.X.X.X</li>
+</ul>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
