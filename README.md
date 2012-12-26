@@ -29,18 +29,18 @@ Features
 
 * ParseConnector: Ember Mixin
   * Provides the AJAX connectivity to the Parse REST API.
-* ParseConnector.JSONTransforms: Ember Data JSONTranforms
+* ParseJSONSerializer: Ember Data JSONSerializer
+  * Provides the translation of objectId to id.
+* ParseJSONTransforms: Ember Data JSONTranforms
   * Provides Date transforms for ISO Dates in Parse.
 * ParseAdapter: Ember Data Adapter
-  * Implements the minimum required Adapter functionality.
+  * Implements the minimum required Adapter CRUD functionality.
 * ParseMixin: Ember Mixin
-  * Provides primary key and created/updated date attributes.
+  * Provides created/updated date attributes.
 
 Issues
 ------
 
-* Translation from 'objectId' to 'id' isn't as clean as it could be.
-* Update/Delete has adapter error due to non-congruent data returned from Parse.
 * Incomplete example.
 * Demo is rough due to Parse acct dependency.
 
@@ -55,5 +55,5 @@ Roadmap
 
 Dev Notes
 ---------
-
+* To get a build simply grunt. You'll find builds inside the /dist folder.
 * Tagging is formatted as 'vX.X.X' v.X.X.X
