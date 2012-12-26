@@ -1,7 +1,7 @@
-Ember.js Data Adapter for Parse
+Ember Data Adapter for Parse
 ===================
 
-An Ember.js Data Adapter built to use the Parse REST API. 
+An Ember Data Adapter built to use the Parse REST API. 
 
 This branch is a full Ember implementation against the Parse REST API without the use
 of the Parse JavaScript SDK. Currently in a very alpha state. 
