@@ -19,17 +19,17 @@ be wiser to use Parse's full XHR implementation (it's small and smart - but I'm 
 Features
 --------
 
-* ParseConnector: Ember Mixin
+##### ParseConnector: Ember Mixin
   * Provides the AJAX connectivity to the Parse REST API.
-* ParseJSONSerializer: Ember Data JSONSerializer
+##### ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id.
   * Provides encoding of hasMany associations to Parse Pointer objects.
-* ParseAdapter: Ember Data Adapter
+##### ParseAdapter: Ember Data Adapter
   * Implements the persistence layer to Parse.
   * Provides either bulk/batch persistence or granular.
-* ParseMixin: Ember Mixin
+##### ParseMixin: Ember Mixin
   * Provides created/updated date attributes.
-* ParseModel: Ember Data Model
+##### ParseModel: Ember Data Model
   * Provides an easy way to setup a Parse object.
 
 Issues
