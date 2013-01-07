@@ -35,22 +35,17 @@
 <p>An Ember Data Adapter built to use the Parse REST API. </p>
 
 <p>This is a full Ember implementation against the Parse REST API without the use
-of the Parse JavaScript SDK. Currently in a very alpha state. At the moment this performs only the simple CRUD features. However the implementation 
-does drop the core of the Parse JavaScript SDK.</p>
+of the Parse JavaScript SDK. Currently in a very alpha state. </p>
 
-<p>This is a CORS implementation. It has nuances. As an example Parse REST API only responds
+<p>Currently by default it will make use of a batched approach to persisting records. However
+there is an implementation for more granular persistence.</p>
+
+<p>Note: This is a CORS implementation. It has nuances. As an example Parse REST API only responds
 to SSL requests. Due to IE8+ CORS implementations that means you must run your app under SSL. As well
 some browsers will perform an OPTIONS call along-side the regular GET/PUT/POST/DELETE 
 (still investigating all of this - and learning). I chose to re-use the Parse XDomainRequest implementation
 and then use jQuery for all other supporting browsers. This might be a dead-end and I might
 be wiser to use Parse's full XHR implementation (it's small and smart - but I'm trying to be original).</p>
-
-<p>Currently works with the Ember versions listed in the example.html AS-IS. 
-The example is using the master branch of Ember and Ember-Data (built for this project). 
-There is also 1 modification done here locally to flip a guard for Ember.BOOTED inside 
-ember-latest.js (line: 5495). I apologize for this kind of kludgery. I dislike it myself. 
-But understand this is temporary and you really shouldn't be using this project yet anyways. 
-In fact you should be forking and fixing. Thanks!</p>
 
 <h2>Features</h2>
 
@@ -62,31 +57,35 @@ In fact you should be forking and fixing. Thanks!</p>
 
 <ul>
 <li>Provides the translation of objectId to id.</li>
-</ul><h5>ParseJSONTransforms: Ember Data JSONTranforms</h5>
-
-<ul>
-<li>Provides Date transforms for ISO Dates in Parse.</li>
+<li>Provides encoding of hasMany associations to Parse Pointer objects.</li>
 </ul><h5>ParseAdapter: Ember Data Adapter</h5>
 
 <ul>
-<li>Implements the minimum required Adapter CRUD functionality.</li>
+<li>Implements the persistence layer to Parse.</li>
+<li>Provides either bulk/batch persistence or granular.</li>
 </ul><h5>ParseMixin: Ember Mixin</h5>
 
 <ul>
 <li>Provides created/updated date attributes.</li>
+</ul><h5>ParseModel: Ember Data Model</h5>
+
+<ul>
+<li>Provides an easy way to setup a Parse object.</li>
 </ul><h2>Issues</h2>
 
 <ul>
 <li>Incomplete example.</li>
+<li>Associations are rough cuts.</li>
+<li>Referenced hasMany associations not serializing during isNew state.</li>
 <li>Demo is rough due to Parse acct dependency.</li>
 </ul><h2>Roadmap</h2>
 
 <ul>
+<li>Determine serialization of new records with hasMany association references.</li>
+<li>Parse Relation for many-to-many associations.</li>
 <li>Implement findQuery.</li>
-<li>Implement findMany.</li>
-<li>Implement Store recordWasError et al in error conditions.</li>
-<li>Implement full type encodings supported by Parse.</li>
-<li>Expose more Parse info inside the ParseMixin.</li>
+<li>Implement Store record error states.</li>
+<li>Implement full type encodings in ParseSerializer supported by Parse (Bytes/Pointer/Relation).</li>
 </ul><h2>Dev Notes</h2>
 
 <ul>
