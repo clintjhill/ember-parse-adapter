@@ -1,24 +1,9 @@
 module('Ember Data Adapter for Parse: Mixin');
 
-var TestMixinApp = Ember.Application.create({
-  rootElement: '#mixinTest',
-  store: DS.Store.create({
-    revision: 10,
-    adapter: DS.FixtureAdapter.create({
-      serializer: ParseJSONSerializer
-    })
-  })
-});
-
-TestMixinApp.mixedIn = DS.Model.extend(ParseMixin, {
-  name: DS.attr('string')
-});
-
-test('Mixin Id mapping', function(){
-
-  var created = TestMixinApp.mixedIn.createRecord({name: 'Create Test'});
-  created.store.commit();
-
-  ok(created.get('id'), 'Assure that an Id is created');
-
+test('Mixin data attributes', function(){
+  var Test = DS.Model.extend(ParseMixin, {});
+  ok(Test.metaForProperty('createdAt'), "Has createdAt property.");
+  equal(Test.metaForProperty('createdAt').type, "date", "createdAt should be date type.");
+  ok(Test.metaForProperty('updatedAt'), "Has updatedAt property.");
+  equal(Test.metaForProperty('updatedAt').type, "date", "createdAt should be date type.");
 });

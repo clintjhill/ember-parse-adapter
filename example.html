@@ -1,16 +1,21 @@
 <!doctype html>
 <html>
 <head>
-  <title>Ember Parse Data Adapter Example</title>
+  <title>Ember Data Adapter for Parse Example</title>
+  <style>
+    body {
+      font: 14px Helvetica, Arial, sans-serif;
+    }
+  </style>
 </head>
 <body>
-<h1>Example for Ember.js Parse Data Adapter</h1>
+<h1>Example for Ember Data Adapter for Parse</h1>
 
 <!-- dependencies -->
 <script src="vendor/jquery.min.js"></script>
-<script src="vendor/handlebars-1.0.0.beta.6.js"></script>
-<script src="vendor/ember-latest.js"></script>
-<script src="vendor/ember-data-latest.js"></script>
+<script src="vendor/handlebars-1.0.rc.1.js"></script>
+<script src="vendor/ember.js"></script>
+<script src="vendor/ember-data.js"></script>
 
 <script src="lib/ember-parse-connector.js"></script>
 <script src="lib/ember-parse-serializer.js"></script>
@@ -18,6 +23,16 @@
 <script src="lib/ember-parse-mixin.js"></script>
 
 <!-- Example application -->
+
+<script type="text/x-handlebars" data-template-name="application">
+<h2>SampleModel Example</h2>
+<form action="#">
+  <label for="exampleName">Sample Name:</label>
+  <input type="text" name="exampleName" id="exampleName" value="" />
+  <button type="submit">Save!</button>
+</form>
+</script>
+
 <script>
 
   // Create an Ember application
@@ -25,8 +40,8 @@
 
   // Add a Data Store to the application that implements a Parse Adapter
   // Be sure to provide your Parse Acct IDs to initialize the connection.
-  ExampleApp.Store = DS.Store.create({
-    revision: 10,
+  ExampleApp.Store = DS.Store.extend({
+    revision: 11,
     adapter: ParseAdapter.create({
       applicationId: '',
       restApiId: '',
@@ -41,6 +56,21 @@
     })
   });
 
+
+  /*
+    Typical Ember Application Controller and View.
+  */
+  ExampleApp.ApplicationController = Ember.Controller.extend();
+  ExampleApp.ApplicationView = Ember.View.extend({
+    templateName: 'application',
+    submit: function(evt){
+      var sample = ExampleApp.SampleModel.createRecord();
+      sample.set('name', this.$('input[name=exampleName]').val());
+      sample.store.commit();
+      return false;
+    }
+  });
+
   /* 
     Create a sample Model that implements a Parse Mixin. 
     This will create a model that will have the following attributes:
@@ -50,20 +80,50 @@
       - date field named updatedAt
       - will be saved as a 'SampleModel' class
   */
-  ExampleApp.SampleModel = DS.Model.extend(ParseMixin, {
+  ExampleApp.SampleModel = ParseModel.extend({
     name: DS.attr('string')
   });
-  
-  // if you wish to not use the name 'SampleModel' set it with parseType
+
+  /*
+    If you wish to not use the name 'SampleModel' set it with parseType
+    and that will be used as the classes name on Parse.
+  */
   ExampleApp.SampleModel.reopenClass({
     parseType: 'Sample'
   });
 
-  ExampleApp.initialize();
-
   /*
-    Now you can use the Ember model as you normally would and it will persist all of it's data to your Parse account.
+    Associations
+
   */
+  ExampleApp.Playlist = ParseModel.extend({
+    name: DS.attr('string'),
+    songs: DS.hasMany('ExampleApp.Song')
+  });
+
+  ExampleApp.Song = ParseModel.extend({
+    name: DS.attr('string'),
+    playlist: DS.belongsTo('ExampleApp.Playlist')
+  });
+  
+
+  ExampleApp.initialize();
+  
+/*  // Create essentially a parent object for the association
+  var playlist = ExampleApp.Playlist.createRecord({name: 'My Rockin tunes'});
+
+  playlist.store.commit();
+
+  // add a song via createRecord 
+  playlist.get('songs').createRecord({name: 'Song from createRecord'});
+  
+  // create a song all by itself
+  var song = ExampleApp.Song.createRecord({name: 'Song from pushObject'});
+  // add it to the playlist via pushObject
+  playlist.get('songs').pushObject(song);
+
+  playlist.store.commit();
+*/
 </script>
 
 </body>

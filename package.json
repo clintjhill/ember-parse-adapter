@@ -1,6 +1,6 @@
 {
   "name": "ember-parse-adapter",
   "description": "Ember.js Adapter for Parse",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Clint Hill"
 }

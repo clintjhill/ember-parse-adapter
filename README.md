@@ -3,25 +3,18 @@ Ember Data Adapter for Parse
 
 An Ember Data Adapter built to use the Parse REST API. 
 
-This branch is a full Ember implementation against the Parse REST API without the use
+This is a full Ember implementation against the Parse REST API without the use
 of the Parse JavaScript SDK. Currently in a very alpha state. 
 
-At the moment this performs only the simple CRUD features. However the implementation 
-does drop the core of the Parse JavaScript SDK.
+Currently by default it will make use of a batched approach to persisting records. However
+there is an implementation for more granular persistence.
 
-This is a CORS implementation. It has nuances. As an example Parse REST API only responds
+Note: This is a CORS implementation. It has nuances. As an example Parse REST API only responds
 to SSL requests. Due to IE8+ CORS implementations that means you must run your app under SSL. As well
 some browsers will perform an OPTIONS call along-side the regular GET/PUT/POST/DELETE 
 (still investigating all of this - and learning). I chose to re-use the Parse XDomainRequest implementation
 and then use jQuery for all other supporting browsers. This might be a dead-end and I might
 be wiser to use Parse's full XHR implementation (it's small and smart - but I'm trying to be original).
-
-The branch currently works with the Ember versions listed in the example.html AS-IS. 
-The example is using the master branch of Ember and Ember-Data (built for this project). 
-There is also 1 modification done here locally to flip a guard for Ember.BOOTED inside 
-ember-latest.js (line: 5495). I apologize for this kind of kludgery. I dislike it myself. 
-But understand this is temporary and you really shouldn't be using this project yet anyways. 
-In fact you should be forking and fixing. Thanks!
 
 Features
 --------
@@ -30,27 +23,31 @@ Features
   * Provides the AJAX connectivity to the Parse REST API.
 * ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id.
-* ParseJSONTransforms: Ember Data JSONTranforms
-  * Provides Date transforms for ISO Dates in Parse.
+  * Provides encoding of hasMany associations to Parse Pointer objects.
 * ParseAdapter: Ember Data Adapter
-  * Implements the minimum required Adapter CRUD functionality.
+  * Implements the persistence layer to Parse.
+  * Provides either bulk/batch persistence or granular.
 * ParseMixin: Ember Mixin
   * Provides created/updated date attributes.
+* ParseModel: Ember Data Model
+  * Provides an easy way to setup a Parse object.
 
 Issues
 ------
 
 * Incomplete example.
+* Associations are rough cuts.
+* Referenced hasMany associations not serializing during isNew state.
 * Demo is rough due to Parse acct dependency.
 
 Roadmap
 -------
 
+* Determine serialization of new records with hasMany association references.
+* Parse Relation for many-to-many associations.
 * Implement findQuery.
-* Implement findMany.
-* Implement Store recordWasError et al in error conditions.
-* Implement full type encodings supported by Parse.
-* Expose more Parse info inside the ParseMixin.
+* Implement Store record error states.
+* Implement full type encodings in ParseSerializer supported by Parse (Bytes/Pointer/Relation).
 
 Dev Notes
 ---------
