@@ -21,14 +21,18 @@ Features
 
 ##### ParseConnector: Ember Mixin
   * Provides the AJAX connectivity to the Parse REST API.
+
 ##### ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id.
   * Provides encoding of hasMany associations to Parse Pointer objects.
+
 ##### ParseAdapter: Ember Data Adapter
   * Implements the persistence layer to Parse.
   * Provides either bulk/batch persistence or granular.
+
 ##### ParseMixin: Ember Mixin
   * Provides created/updated date attributes.
+
 ##### ParseModel: Ember Data Model
   * Provides an easy way to setup a Parse object.
 
