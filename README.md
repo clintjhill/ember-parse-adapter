@@ -16,7 +16,7 @@ Features
 
 ##### ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id.
-  * Provides encoding of hasMany associations to Parse Pointer objects.
+  * Provides encoding of hasMany associations to [Parse Pointer objects](https://parse.com/docs/rest#objects-types).
   * Provides batch serialization according to [Parse batch operations](https://parse.com/docs/rest#objects-batch).
 
 ##### ParseAdapter: Ember Data Adapter
