@@ -32,20 +32,7 @@
       <section>
         <h1>Ember Data Adapter for Parse</h1>
 
-<p>An Ember Data Adapter built to use the Parse REST API. </p>
-
-<p>This is a full Ember implementation against the Parse REST API without the use
-of the Parse JavaScript SDK. Currently in a very alpha state. </p>
-
-<p>Currently by default it will make use of a batched approach to persisting records. However
-there is an implementation for more granular persistence.</p>
-
-<p>Note: This is a CORS implementation. It has nuances. As an example Parse REST API only responds
-to SSL requests. Due to IE8+ CORS implementations that means you must run your app under SSL. As well
-some browsers will perform an OPTIONS call along-side the regular GET/PUT/POST/DELETE 
-(still investigating all of this - and learning). I chose to re-use the Parse XDomainRequest implementation
-and then use jQuery for all other supporting browsers. This might be a dead-end and I might
-be wiser to use Parse's full XHR implementation (it's small and smart - but I'm trying to be original).</p>
+<p>An <a href="https://github.com/emberjs/data">Ember Data Adapter</a> built to use the <a href="https://parse.com/docs/rest">Parse REST API</a>. This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK. It is implemented against <a href="https://github.com/emberjs/data/blob/master/BREAKING_CHANGES.md">revision 11</a> of the Ember Data framework.</p>
 
 <h2>Features</h2>
 
@@ -53,16 +40,19 @@ be wiser to use Parse's full XHR implementation (it's small and smart - but I'm 
 
 <ul>
 <li>Provides the AJAX connectivity to the Parse REST API.</li>
+<li>CORS implementation</li>
 </ul><h5>ParseJSONSerializer: Ember Data JSONSerializer</h5>
 
 <ul>
-<li>Provides the translation of objectId to id.</li>
-<li>Provides encoding of hasMany associations to Parse Pointer objects.</li>
+<li>Provides the translation of objectId to id for identity mapping.</li>
+<li>Provides encoding of hasMany associations to <a href="https://parse.com/docs/rest#objects-types">Parse Pointer objects</a>.</li>
+<li>Provides batch serialization according to <a href="https://parse.com/docs/rest#objects-batch">Parse batch operations</a>.</li>
+<li>Serializes Date types to the <a href="https://parse.com/docs/rest#objects-types">ISO 8601 as used by Parse</a>.</li>
 </ul><h5>ParseAdapter: Ember Data Adapter</h5>
 
 <ul>
 <li>Implements the persistence layer to Parse.</li>
-<li>Provides either bulk/batch persistence or granular.</li>
+<li>Provides either bulk/batch persistence or granular (bulkCommit by default).</li>
 </ul><h5>ParseMixin: Ember Mixin</h5>
 
 <ul>
@@ -71,26 +61,60 @@ be wiser to use Parse's full XHR implementation (it's small and smart - but I'm 
 
 <ul>
 <li>Provides an easy way to setup a Parse object.</li>
-</ul><h2>Issues</h2>
+</ul><h2>Get Started</h2>
+
+<p>Grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.</p>
+
+<div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"handlebars-1.0.rc.1.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember-data.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember-parse-adapter-0.0.9.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+</pre></div>
+
+<p>Next you'll want to get an account at Parse: <a href="https://parse.com/">https://parse.com/</a>. After this you will be provided with three keys:</p>
 
 <ul>
-<li>Incomplete example.</li>
-<li>Associations are rough cuts.</li>
-<li>Referenced hasMany associations not serializing during isNew state.</li>
+<li>Application ID</li>
+<li>JavaScript Key</li>
+<li>REST API Key</li>
+</ul><p>You will need each of these to configure the ParseAdapter.</p>
+
+<div class="highlight"><pre>  <span class="kd">var</span> <span class="nx">App</span> <span class="o">=</span> <span class="nx">Ember</span><span class="p">.</span><span class="nx">Application</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+
+  <span class="nx">App</span><span class="p">.</span><span class="nx">Store</span> <span class="o">=</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">Store</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">revision</span><span class="o">:</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="nx">adapter</span><span class="o">:</span> <span class="nx">ParseAdapter</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+      <span class="nx">applicationId</span><span class="o">:</span> <span class="s1">'&lt;YOUR APP ID HERE&gt;'</span><span class="p">,</span>
+      <span class="nx">restApiId</span><span class="o">:</span> <span class="s1">'&lt;YOUR REST API KEY HERE&gt;'</span><span class="p">,</span>
+      <span class="nx">javascriptId</span><span class="o">:</span> <span class="s1">'&lt;YOUR JAVASCRIPT KEY HERE&gt;'</span>
+    <span class="p">})</span>
+  <span class="p">});</span>
+</pre></div>
+
+<p>Once you have your adapter configured now you can create ParseModels just as you would create DS.Models.</p>
+
+<div class="highlight"><pre>  <span class="nx">App</span><span class="p">.</span><span class="nx">Post</span> <span class="o">=</span> <span class="nx">ParseModel</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="nx">title</span><span class="o">:</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'string'</span><span class="p">),</span>
+    <span class="nx">body</span><span class="o">:</span> <span class="nx">DS</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'string'</span><span class="p">)</span>
+  <span class="p">});</span>
+</pre></div>
+
+<h2>Issues</h2>
+
+<ul>
 <li>Demo is rough due to Parse acct dependency.</li>
+<li>Error conditions are handled only by logging the error.</li>
 </ul><h2>Roadmap</h2>
 
 <ul>
-<li>Determine serialization of new records with hasMany association references.</li>
 <li>Parse Relation for many-to-many associations.</li>
-<li>Implement findQuery.</li>
 <li>Implement Store record error states.</li>
 <li>Implement full type encodings in ParseSerializer supported by Parse (Bytes/Pointer/Relation).</li>
 </ul><h2>Dev Notes</h2>
 
 <ul>
 <li>To get a build simply grunt. You'll find builds inside the /dist folder.</li>
-<li>Tagging is formatted as 'vX.X.X' v.X.X.X</li>
 </ul>
       </section>
       <footer>
