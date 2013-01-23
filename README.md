@@ -1,9 +1,7 @@
 Ember Data Adapter for Parse
 ===================
 
-An Ember Data Adapter built to use the Parse REST API.
-
-This is a full Ember implementation against the Parse REST API without the use
+An Ember Data Adapter built to use the Parse REST API. This is a full Ember implementation against the Parse REST API without the use
 of the Parse JavaScript SDK.
 
 Currently by default it will make use of a batched approach to persisting records. However
@@ -19,7 +17,7 @@ Features
 ##### ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id.
   * Provides encoding of hasMany associations to Parse Pointer objects.
-  * Provides batch serialization according to [Parse batch operations|https://parse.com/docs/rest#objects-batch].
+  * Provides batch serialization according to [Parse batch operations](https://parse.com/docs/rest#objects-batch).
 
 ##### ParseAdapter: Ember Data Adapter
   * Implements the persistence layer to Parse.
