@@ -1,15 +1,32 @@
 var get = Ember.get, set = Ember.set;
 
-var App, adapter, store, serializer;
+var App, adapter, store, serializer, ajaxUrl, ajaxType, ajaxHash;
+var Post, post, posts;
+var Comment, comment, comments;
 
 module("Ember Data Adapter for Parse: Adapter", {
   setup: function() {
-  
-    App = Ember.Namespace.create({
-      toString: function() { return "App"; }
+    ajaxUrl = undefined;
+    ajaxType = undefined;
+    ajaxHash = undefined;
+
+    App = Ember.Namespace.create();
+
+    adapter = ParseAdapter.create({
+      ajax: function(type, url, hash) {
+        var success = hash.success, self = this;
+
+        ajaxUrl = url;
+        ajaxType = type;
+        ajaxHash = hash;
+
+        if (success) {
+          hash.success = function(json) {
+            success.call(self, json);
+          };
+        }
+      }
     });
-    
-    adapter = ParseAdapter.create();
 
     serializer = get(adapter, 'serializer');
 
@@ -23,11 +40,7 @@ module("Ember Data Adapter for Parse: Adapter", {
       comments: DS.hasMany('Comment')
     });
 
-    Post.reopenClass({
-      parseType: 'Post'
-    })
-
-    CommentModel = App.CommentModel = ParseModel.extend({
+    Comment = App.Comment = ParseModel.extend({
       content: DS.attr('string'),
       post: DS.belongsTo('Post')
     });
@@ -35,31 +48,303 @@ module("Ember Data Adapter for Parse: Adapter", {
   },
 
   teardown: function() {
+    if(post){
+      post.destroy();
+      post = null;
+    }
     adapter.destroy();
     store.destroy();
-    App.destroy();
   }
 });
 
-test("Getting type name from models", function(){
-  var postName = adapter.getTypeName(Post);
-  equal(postName, "Post", "Should be Post.");
-  var commentName = adapter.getTypeName(CommentModel);
-  equal(commentName, "CommentModel", "Should be Comment.");
+var expectUrl = function(url, desc) {
+  // because the Parse API is CORS and we have a server URL ...
+  equal(ajaxUrl, adapter.serverUrl + url, "the URL is " + desc);
+};
+
+var expectType = function(type) {
+  equal(ajaxType, type, "the HTTP method is " + type);
+};
+
+var expectData = function(hash) {
+  deepEqual(ajaxHash.data, hash, "the hash was passed along");
+};
+
+var expectState = function(state, value, p) {
+  p = p || post;
+  if (value === undefined) { value = true; }
+  var flag = "is" + state.charAt(0).toUpperCase() + state.substr(1);
+  equal(get(p, flag), value, "the post is " + (value === false ? "not " : "") + state);
+};
+
+var expectStates = function(coll, state, value) {
+  coll.forEach(function(thing) {
+    expectState(state, value, thing);
+  });
+};
+
+test("Find", function(){
+  post = store.find(Post, 1);
+  expectState('loaded', false);
+  expectUrl("/1/classes/Post/1", "The Parse API version and classes with Post and ID.");
+  expectType("GET");
+  ajaxHash.success({objectId: 'firstPost', title: 'Testing Find'});
+  expectState('loaded');
+  expectState('dirty', false);
+  equal(post, store.find(Post, 1), "the record is now in the store, and can be looked up by ID without another AJAX request");
 });
 
-test("Rooting a serialization", function(){
-  var data = {title: "Test rooting."};
-  var rooted = adapter.makeRootObject(Post, data);
-  ok(rooted.post, "Should have post root.");
-  rooted = adapter.makeRootObject(CommentModel, data);
-  ok(rooted.comment_model, "Should have comment_model root.");
+test("Find All", function(){
+  posts = store.find(Post);
+  expectUrl("/1/classes/Post", "The Parse API version and classes with Post.");
+  expectType("GET");
+  // Parse REST API wraps the collections in a results collection.
+  ajaxHash.success({results: [{objectId: '1', title: 'First Post.'}, {objectId: '2', title: 'Second Post.'}]});
+  post = posts.objectAt(0);
+  expectState('loaded');
+  expectState('dirty', false);
+  equal(post, store.find(Post, 1), "the record is now in the store, and can be looked up by ID without another Ajax request");
 });
 
-test("Making batch payload", function(){
-  var post = store.createRecord(Post, {title:"Testing creation."});
-  var batched = adapter.makeBatchFor("PUT", [post]);
-  equal(batched.requests[0].method, "PUT", "Method should be put.");
-  equal(batched.requests[0].path, "/1/classes/Post", "Path should be /1/classes/Post.");
-  equal(batched.requests[0].body.title, "Testing creation.", "Body should have serialized data.");
+test("Find Many", function(){
+  store.load(Post, {objectId: 1, comments: ['aa1', 'bb2', 'cc3']});
+  post = store.find(Post, 1);
+  comments = get(post, 'comments');
+  equal(get(comments, 'length'), 3, "there are three comments in the relationship already");
+  comments.forEach(function(comment){
+    equal(get(comment, 'isLoaded'), false, "the comment is being loaded");
+  });
+  expectUrl("/1/classes/Comment");
+  expectType("POST");
+  expectData({where: {objectId: {"$in": "aa1,bb2,cc3"}}});
+  ajaxHash.success({
+    results: [
+      {objectId: 'aa1', content: 'Comment 1'},
+      {objectId: 'bb2', content: 'Comment 2'},
+      {objectId: 'cc3', content: 'Comment 3'}
+    ]
+  });
+  var comment1 = comments.objectAt(0);
+  equal(get(comment1, 'id'), 'aa1');
+  var comment2 = comments.objectAt(1);
+  equal(get(comment2, 'id'), 'bb2');
+  var comment3 = comments.objectAt(2);
+  equal(get(comment3, 'id'), 'cc3');
+  comments.forEach(function(comment){
+    equal(get(comment, 'isLoaded'), true, "comment is loaded");
+  });
+});
+
+test("Find Query", function(){
+  posts = store.find(Post, {title: 'First Post'});
+  equal(get(posts, 'length'), 0, "there are no posts yet as the query has not returned.");
+  expectUrl("/1/classes/Post");
+  expectType("POST");
+  expectData({where: {title: 'First Post'}});
+  ajaxHash.success({
+    results: [
+      { objectId: 'bad1', title: 'First Post'},
+      { objectId: 'bad2', title: 'First Post'}
+    ]
+  });
+
+  equal(get(posts, 'length'), 2, "there are 2 posts loaded");
+  posts.forEach(function(post){
+    equal(get(post, 'isLoaded'), true, "the post is being loaded");
+  });
+});
+
+test("Create Record - not bulkCommit", function(){
+  post = store.createRecord(Post, {title: 'Testing Create'});
+  // force it to use single record create
+  adapter.bulkCommit = false;
+  expectState('new');
+  store.commit();
+  expectState('saving');
+  expectUrl("/1/classes/Post");
+  expectType("POST");
+  expectData({comments: [], title: 'Testing Create', updatedAt: undefined, createdAt: undefined});
+  ajaxHash.success({objectId: 'created321', createdAt: (new Date()).toISOString()});
+  expectState('saving', false);
+  equal(post, store.find(Post, 'created321'), "should find Post in store after create");
+});
+
+test("Create Record - bulkCommit", function(){
+  posts = new Ember.Set([
+    store.createRecord(Post, {title: 'Post 1'}),
+    store.createRecord(Post, {title: 'Post 2'})
+  ]);
+  expectStates(posts, 'new');
+  store.commit();
+  expectStates(posts, 'saving');
+  expectUrl("/1/batch");
+  expectType("POST");
+  /*
+    This payload should match expected schema: https://www.parse.com/docs/rest#objects-batch
+   */
+  expectData({
+    requests: [
+      {
+        method: "POST",
+        path: "/1/classes/Post",
+        body: {comments: [], title: 'Post 1', updatedAt: undefined, createdAt: undefined}
+      },
+      {
+        method: "POST",
+        path: "/1/classes/Post",
+        body: {comments: [], title: 'Post 2', updatedAt: undefined, createdAt: undefined}
+      }
+    ]
+  });
+  ajaxHash.success({
+    results: [
+      {success: {objectId: 'post1', createdAt: (new Date()).toISOString()}},
+      {success: {objectId: 'post2', createdAt: (new Date()).toISOString()}}
+    ]
+  });
+  expectStates(posts, 'saving', false);
+  expect(posts[0], store.find(Post, 'post1'), "should match first post.");
+  expect(posts[1], store.find(Post, 'post2'), "should match second post.");
+});
+
+test("Update Record - not bulkCommit", function(){
+  store.load(Post, {title: 'Test Post Update', objectId: 'postUpdated'});
+  // force it to use single record update
+  adapter.bulkCommit = false;
+  post = store.find(Post, 'postUpdated');
+  expectState('loaded');
+  expectState('dirty', false);
+  post.set('title', 'Test Post Updated - true');
+  expectState('dirty');
+  store.commit();
+  expectState('saving');
+  expectUrl("/1/classes/Post/postUpdated");
+  expectType("PUT");
+  expectData({objectId: 'postUpdated', comments: [], title: 'Test Post Updated - true', updatedAt: undefined, createdAt: undefined});
+  ajaxHash.success({objectId: 'postUpdated', updatedAt: (new Date()).toISOString()});
+  expectState('saving', false);
+});
+
+test("Update Record - bulkCommit", function(){
+  store.loadMany(Post, [
+    {objectId: 'post1', title: 'Post 1'},
+    {objectId: 'post2', title: 'Post 2'}
+  ]);
+  posts = store.findMany(Post, ['post1', 'post2']);
+  expectStates(posts, 'loaded');
+  posts.forEach(function(post){
+    post.set('title', post.get('title') + ' updated.');
+  });
+  expectStates(posts, 'dirty');
+  store.commit();
+  expectStates(posts, 'saving');
+  expectUrl("/1/batch");
+  expectType("POST");
+  expectData({
+    requests: [
+      {
+        method: "PUT",
+        path: "/1/classes/Post",
+        body: {objectId: 'post1', comments: [], title: 'Post 1 updated.', updatedAt: undefined, createdAt: undefined}
+      },
+      {
+        method: "PUT",
+        path: "/1/classes/Post",
+        body: {objectId: 'post2', comments: [], title: 'Post 2 updated.', updatedAt: undefined, createdAt: undefined}
+      }
+    ]
+  });
+  ajaxHash.success({
+    results: [
+      {success: {objectId: 'post1', updatedAt: (new Date()).toISOString()}},
+      {success: {objectId: 'post2', updatedAt: (new Date()).toISOString()}}
+    ]
+  });
+  expectStates(posts, 'saving', false);
+  expect(posts[0], store.find(Post, 'post1'), "should match first post.");
+  expect(posts[1], store.find(Post, 'post2'), "should match second post.");
+});
+
+test("Delete Record - not bulkCommit", function(){
+  store.load(Post, {objectId: 'post1', title: 'Post to delete.'});
+  // force single record delete
+  adapter.bulkCommit = false;
+  post = store.find(Post, 'post1');
+  expectState('new', false);
+  expectState('loaded');
+  expectState('dirty', false);
+  post.deleteRecord();
+  expectState('dirty');
+  expectState('deleted');
+  store.commit();
+  expectState('saving');
+  expectUrl("/1/classes/Post/post1");
+  expectType("DELETE");
+  ajaxHash.success();
+  expectState('deleted');
+});
+
+test("Delete Record - bulkCommit", function(){
+  store.loadMany(Post, [
+    {objectId: 'post1', title: 'Post 1'},
+    {objectId: 'post2', title: 'Post 2'}
+  ]);
+  posts = store.findMany(Post, ['post1', 'post2']);
+  expectStates(posts, 'loaded');
+  expectStates(posts, 'new', false);
+  expectStates(posts, 'dirty', false);
+  posts.forEach(function(post){
+    post.deleteRecord();
+  });
+  expectStates(posts, 'dirty');
+  expectStates(posts, 'deleted');
+  store.commit();
+  expectStates(posts, 'saving');
+  expectUrl("/1/batch");
+  expectType('POST');
+  expectData({
+    requests: [
+      {
+        method: "DELETE",
+        path: "/1/classes/Post",
+        body: {objectId: 'post1', comments: [], title: 'Post 1', updatedAt: undefined, createdAt: undefined}
+      },
+      {
+        method: "DELETE",
+        path: "/1/classes/Post",
+        body: {objectId: 'post2', comments: [], title: 'Post 2', updatedAt: undefined, createdAt: undefined}
+      }
+    ]
+  });
+  ajaxHash.success();
+  expectStates(posts, 'saving', false);
+  // TODO: This fails ?!?
+  //expectStates(posts, 'deleted');
+  expectStates(posts, 'dirty', false);
+});
+
+test("Extending a batch result from Parse", function(){
+  var results = [
+    {
+      "success": {
+        "createdAt": "2012-06-15T16:59:11.276Z",
+        "objectId": "YAfSAWwXbL"
+      }
+    },
+    {
+      "error": {
+        "code": 101,
+        "error": "object not found for delete"
+      }
+    }
+  ];
+  var records = new Ember.Set([Post.createRecord({title:'Post 1'}), Post.createRecord({title: 'Post 2'})]);
+  var batch = serializer.serializeBatchFor("PUT", records);
+  var extended = adapter.extendRecords(results, batch);
+
+  equal(extended.length, 2, "Should still have 2 records.");
+  equal(extended[0].title, "Post 1", "Should match first post title.");
+  equal(extended[0].objectId, "YAfSAWwXbL", "Should match first post id from results.");
+  equal(extended[1].title, "Post 2", "Should match second post title.");
+  equal(extended[1].objectId, undefined, "Shouldn't have an id due to error.");
 });

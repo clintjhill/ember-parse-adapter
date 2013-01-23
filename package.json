@@ -1,6 +1,14 @@
 {
-  "name": "ember-parse-adapter",
-  "description": "Ember.js Adapter for Parse",
-  "version": "0.0.8",
-  "author": "Clint Hill"
+  "name": "ember-data-parse-adapter",
+  "description": "Ember Data Adapter for Parse",
+  "version": "0.0.9",
+  "author": "Clint Hill",
+  "devDependencies": {
+    "grunt": "~0.4.0rc6",
+    "grunt-contrib-jshint": "~0.1.0",
+    "grunt-contrib-qunit": "~0.1.1",
+    "grunt-contrib-uglify": "~0.1.1",
+    "grunt-contrib-connect": "~0.1.0",
+    "grunt-contrib-concat": "~0.1.2"
+  }
 }
