@@ -1,7 +1,7 @@
 Ember Data Adapter for Parse
 ===================
 
-An [Ember Data Adapter](https://github.com/emberjs/data) built to use the [Parse REST API](https://parse.com/docs/rest). This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK.
+An [Ember Data Adapter](https://github.com/emberjs/data) built to use the [Parse REST API](https://parse.com/docs/rest). This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK. It is implemented against [revision 11](https://github.com/emberjs/data/blob/master/BREAKING_CHANGES.md) of the Ember Data framework.
 
 Features
 --------
@@ -28,8 +28,17 @@ Features
 
 Get Started
 -----------
+Grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.
 
-First you'll want to get an account at Parse: https://parse.com/. After this you will be provided with three keys:
+```html
+<script src="jquery.min.js"></script>
+<script src="handlebars-1.0.rc.1.js"></script>
+<script src="ember.js"></script>
+<script src="ember-data.js"></script>
+<script src="ember-parse-adapter-0.0.9.js"></script>
+```
+
+Next you'll want to get an account at Parse: https://parse.com/. After this you will be provided with three keys:
 
 * Application ID
 * JavaScript Key
@@ -75,4 +84,3 @@ Roadmap
 Dev Notes
 ---------
 * To get a build simply grunt. You'll find builds inside the /dist folder.
-* Tagging is formatted as 'vX.X.X' v.X.X.X
