@@ -72,6 +72,7 @@ Issues
 ------
 
 * Demo is rough due to Parse acct dependency.
+* findQuery implementation is a bit weak/brittle. Needs full [Parse Query](https://parse.com/docs/rest#queries-constraints).
 * Error conditions are handled only by logging the error.
 
 Roadmap
