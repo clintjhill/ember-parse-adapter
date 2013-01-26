@@ -15,7 +15,9 @@ module.exports = function(grunt){
           'lib/ember-parse-serializer.js',
           'lib/ember-parse-adapter.js',
           'lib/ember-parse-mixin.js',
-          'lib/ember-parse-model.js'],
+          'lib/ember-parse-model.js',
+          'lib/ember-parse-user.js'
+        ],
         dest: 'dist/ember-parse-adapter-<%= pkg.version %>.js'
       }
     },

@@ -166,6 +166,7 @@ test("Create Record - not bulkCommit", function(){
   expectData({comments: [], title: 'Testing Create', updatedAt: undefined, createdAt: undefined});
   ajaxHash.success({objectId: 'created321', createdAt: (new Date()).toISOString()});
   expectState('saving', false);
+  expectState('dirty', false);
   equal(post, store.find(Post, 'created321'), "should find Post in store after create");
 });
 

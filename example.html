@@ -13,7 +13,7 @@
 
 <!-- dependencies -->
 <script src="vendor/jquery.min.js"></script>
-<script src="vendor/handlebars-1.0.rc.1.js"></script>
+<script src="vendor/handlebars-1.0.rc.2.js"></script>
 <script src="vendor/ember.js"></script>
 <script src="vendor/ember-data.js"></script>
 
@@ -21,6 +21,8 @@
 <script src="lib/ember-parse-serializer.js"></script>
 <script src="lib/ember-parse-adapter.js"></script>
 <script src="lib/ember-parse-mixin.js"></script>
+<script src="lib/ember-parse-model.js"></script>
+<script src="lib/ember-parse-user.js"></script>
 
 <!-- Example application -->
 
@@ -47,7 +49,7 @@
       restApiId: '',
       javascriptId: ''
       /*
-        You could configure even further but for the moment these are 
+        You could configure even further but for the moment these are
         pretty static.
       */
       //  serverUrl: "https://api.parse.com",
@@ -71,8 +73,8 @@
     }
   });
 
-  /* 
-    Create a sample Model that implements a Parse Mixin. 
+  /*
+    Create a sample Model that implements a Parse Mixin.
     This will create a model that will have the following attributes:
 
       - primaryKey = 'objectId'
@@ -105,18 +107,18 @@
     name: DS.attr('string'),
     playlist: DS.belongsTo('ExampleApp.Playlist')
   });
-  
+
 
   ExampleApp.initialize();
-  
+
 /*  // Create essentially a parent object for the association
   var playlist = ExampleApp.Playlist.createRecord({name: 'My Rockin tunes'});
 
   playlist.store.commit();
 
-  // add a song via createRecord 
+  // add a song via createRecord
   playlist.get('songs').createRecord({name: 'Song from createRecord'});
-  
+
   // create a song all by itself
   var song = ExampleApp.Song.createRecord({name: 'Song from pushObject'});
   // add it to the playlist via pushObject

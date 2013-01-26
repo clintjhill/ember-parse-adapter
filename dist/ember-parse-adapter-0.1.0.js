@@ -100,9 +100,11 @@ var ParseConnector = Ember.Mixin.create({
    * @param  {String} model   string name of the class/type we're sending
    * @param  {String} id      identifier for the record (objectId in Parse)
    * @param  {Object} data    POST/PUT body data
-   * @param  {Object} options hash for AJAX (success/error callbacks)
+   * @param  {Object} options hash for AJAX (success/error callbacks and URL)
    */
   request: function(method, model, id, data, options){
+
+    var url, custom;
 
     if(Ember.typeOf(id) === 'object'){
       options = data;
@@ -115,7 +117,16 @@ var ParseConnector = Ember.Mixin.create({
       data = {};
     }
 
-    this.ajax(method, this.buildUrl(model, id),
+    // if the request was provided URL information use it instead of the model name.
+    if(options.url){
+      url = options.url;
+      custom = true;
+    } else {
+      url = model;
+      custom = false;
+    }
+
+    this.ajax(method, this.buildUrl(url, id, custom),
       {data: data, success: options.success, error: options.error});
   },
 
@@ -125,14 +136,21 @@ var ParseConnector = Ember.Mixin.create({
   },
 
   /**
-   * Creates a URL to use for the HTTP request to Parse
+   * Creates a URL to use for the HTTP request to Parse.
+   *
+   * This function will perform inspection for the parseClass being a
+   * DS.ParseUser in order to assure that the special pathing Parse uses
+   * for User objects is set accordingly.
+   *
    * @param  {String} parseClass  string of the type/class in the URL
    * @param  {String} id          string identifier (objectId in Parse, id in Ember)
    */
-  buildUrl: function(parseClass, id){
+  buildUrl: function(parseClass, id, custom){
     var modelUrl;
     if(parseClass === 'DS.ParseUser'){
       modelUrl = "%@/%@/%@".fmt(this.serverUrl, this.versionPath, "users");
+    } else if(custom) {
+      modelUrl = "%@/%@/%@".fmt(this.serverUrl, this.versionPath, parseClass);
     } else {
       modelUrl = "%@/%@/%@/%@".fmt(this.serverUrl, this.versionPath, this.modelPath, parseClass);
     }
@@ -530,19 +548,19 @@ var ParseUser = DS.ParseUser = ParseModel.extend({
     this.set('username', username);
     this.set('password', password);
 
-    // make this model conform to standard eventing
+    // make this model conform to states
     this.send('willCommit');
 
     data = adapter.get('serializer').serialize(this);
 
     adapter.request("POST", ParseUser.toString(), data, {
+      url: "users",
       success: function(result){
-        Ember.run(this, function(){
+        Ember.run(adapter, function(){
+          // dump the password
+          delete data.password;
           $.extend(data, result);
-          // TODO: Check into the type/record weirdness here.
-          this.didCreateRecord(store, record, record, this.makeRootObject(record, data));
-          record.set('sessionToken', result.sessionToken);
-          record.set('password', null);
+          adapter.didCreateRecord(store, record.constructor, record, adapter.makeRootObject(record.constructor, data));
         });
       },
       error: function(result){
@@ -561,8 +579,40 @@ var ParseUser = DS.ParseUser = ParseModel.extend({
    */
   login: function(attrs){
     var username = (attrs && attrs.username) || this.get("username"),
-      password = (attrs && attrs.password) || this.get("password");
-    // GET to /login
+      password = (attrs && attrs.password) || this.get("password"),
+      store = this.store,
+      adapter = this.store.adapter,
+      data,
+      record = this;
+
+    if(!username && !password){
+      throw 'Hey - you cannot login without all this stuff man!';
+    }
+
+    this.set('username', username);
+    this.set('password', password);
+
+    // make this model conform to states
+    this.send('willCommit');
+
+    data = adapter.get('serializer').serialize(this);
+
+    adapter.request("GET", ParseUser.toString(), data, {
+      url: "login",
+      success: function(result){
+        Ember.run(adapter, function(){
+          // dump the password
+          delete data.password;
+          $.extend(data, result);
+          adapter.didCreateRecord(store, record.constructor, record, adapter.makeRootObject(record.constructor, data));
+        });
+      },
+      error: function(result){
+        // TODO: Errors to handle
+        // {"code":202,"error":"username clintjhill already taken"}
+        // {"code":203,"error":"the email address clint.hill@goaaa.com has already been taken"}
+      }
+    });
   },
 
   /**
@@ -571,7 +621,8 @@ var ParseUser = DS.ParseUser = ParseModel.extend({
    */
   isCurrent: function(){
     // TODO: Just because we have a session token doesn't mean we're current right?
-    return this.get('sessionToken');
+    var sessionToken = this.get('sessionToken');
+    return sessionToken !== null && sessionToken !== undefined && sessionToken !== '';
   }.property('sessionToken')
 
 });
