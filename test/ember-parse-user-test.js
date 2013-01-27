@@ -134,18 +134,23 @@ test("Login", function(){
   equal(user.get('password'), null, "Be sure that password gets dumped.");
 });
 
-test("Password Reset", function(){
+test("Password Reset Request", function(){
   store.load(User, {objectId: 'aid8nalX'});
   user = store.find(User, 'aid8nalX');
-  user.on('resettingPassword', function(){
-    expectUserState('passwordReset');
+  // expected events
+  user.on('requestingPasswordReset', function(){
+    // while password reset request is being sent
+    expectUserState('passwordResetting');
   });
-  user.on('didResetPassword', function(){
+  user.on('didRequestPasswordReset', function(){
+    // password reset request happened
     expectUserState('loaded');
   });
-  user.resetPassword('clint.hill@gmail.com');
+  // reset it
+  user.requestPasswordReset('clint.hill@gmail.com');
   expectType("POST");
   expectUrl("/1/requestPasswordReset", "Request password path from Parse.");
-  expectUserState('passwordReset');
+  expectUserState('passwordResetting');
   ajaxHash.success();
+  expectUserState('loaded');
 });
