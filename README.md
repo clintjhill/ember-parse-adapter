@@ -78,6 +78,9 @@ Issues
 Roadmap
 -------
 
+* Parse User implementation
+* Parse Roles implementation
+* Parse ACL implementation
 * Parse Relation for many-to-many associations.
 * Implement Store record error states.
 * Implement full type encodings in ParseSerializer supported by Parse (Bytes/Pointer/Relation).

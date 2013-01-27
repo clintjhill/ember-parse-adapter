@@ -142,8 +142,8 @@ if ('undefined' !== typeof window) {
 
 })();
 
-// Version: v1.0.0-pre.4-31-g16442c5
-// Last commit: 16442c5 (2013-01-23 23:48:09 -0800)
+// Version: v1.0.0-pre.4-51-ge95c992
+// Last commit: e95c992 (2013-01-26 20:37:14 -0800)
 
 
 (function() {
@@ -6373,7 +6373,7 @@ Ember.empty = Ember.deprecateFunc("Ember.empty is deprecated. Please use Ember.i
   Ember.compare('hello', 'hello');  // 0
   Ember.compare('abc', 'dfg');      // -1
   Ember.compare(2, 1);              // 1
-  ```javascript
+  ```
 
  @method compare
  @for Ember
@@ -8195,7 +8195,7 @@ Ember.Array = Ember.Mixin.create(Ember.Enumerable, /** @scope Ember.Array.protot
     arr.indexOf("a", -1);   //  4
     arr.indexOf("b", 3);    // -1
     arr.indexOf("a", 100);  // -1
-    ```javascript
+    ```
 
     @method indexOf
     @param {Object} object the item to search for
@@ -8840,7 +8840,7 @@ Ember.MutableArray = Ember.Mixin.create(Ember.Array, Ember.MutableEnumerable,
     var colors = ["red", "green", "blue"];
     colors.insertAt(2, "yellow");  // ["red", "green", "yellow", "blue"]
     colors.insertAt(5, "orange");  // Error: Index out of range
-    ```javascript
+    ```
 
     @method insertAt
     @param {Number} idx index of insert the object at.
@@ -9140,9 +9140,6 @@ var get = Ember.get, set = Ember.set, defineProperty = Ember.defineProperty;
   @extends Ember.Mixin
 */
 Ember.Observable = Ember.Mixin.create(/** @scope Ember.Observable.prototype */ {
-
-  // compatibility
-  isObserverable: true,
 
   /**
     Retrieves the value of a property from the object.
@@ -11914,6 +11911,9 @@ var get = Ember.get;
   @extends Ember.Mixin
 */
 Ember.ControllerMixin = Ember.Mixin.create({
+  /* ducktype as a controller */
+  isController: true,
+
   /**
     The object to which events from the view should be sent.
 
@@ -17762,7 +17762,7 @@ var DOMManager = {
     view.transitionTo('preRender');
 
     Ember.run.schedule('render', this, function() {
-      if (get(view, 'isDestroyed')) { return; }
+      if (view.isDestroying) { return; }
 
       view.clearRenderedChildren();
       var buffer = view.renderToBuffer();
@@ -19323,7 +19323,7 @@ Ember.Handlebars.registerHelper('collection', function(path, options) {
     if (hash.hasOwnProperty(prop)) {
       match = prop.match(/^item(.)(.*)$/);
 
-      if(match) {
+      if(match && prop !== 'itemController') {
         // Convert itemShouldFoo -> shouldFoo
         itemHash[match[1].toLowerCase() + match[2]] = hash[prop];
         // Delete from hash as this will end up getting passed to the
@@ -19461,6 +19461,42 @@ Ember.Handlebars.registerHelper('debugger', function() {
 var get = Ember.get, set = Ember.set;
 
 Ember.Handlebars.EachView = Ember.CollectionView.extend(Ember._Metamorph, {
+  init: function() {
+    var itemController = get(this, 'itemController');
+    var binding;
+
+    if (itemController) {
+      var controller = Ember.ArrayController.create();
+      set(controller, 'itemController', itemController);
+      set(controller, 'container', get(this, 'controller.container'));
+      set(controller, '_eachView', this);
+      this.disableContentObservers(function() {
+        set(this, 'content', controller);
+        binding = new Ember.Binding('content', '_eachView.dataSource').oneWay();
+        binding.connect(controller);
+      });
+
+      set(this, '_arrayController', controller);
+    } else {
+      this.disableContentObservers(function() {
+        binding = new Ember.Binding('content', 'dataSource').oneWay();
+        binding.connect(this);
+      });
+    }
+
+    return this._super();
+  },
+
+  disableContentObservers: function(callback) {
+    Ember.removeBeforeObserver(this, 'content', null, '_contentWillChange');
+    Ember.removeObserver(this, 'content', null, '_contentDidChange');
+
+    callback.apply(this);
+
+    Ember.addBeforeObserver(this, 'content', null, '_contentWillChange');
+    Ember.addObserver(this, 'content', null, '_contentDidChange');
+  },
+
   itemViewClass: Ember._MetamorphView,
   emptyViewClass: Ember._MetamorphView,
 
@@ -19471,6 +19507,7 @@ Ember.Handlebars.EachView = Ember.CollectionView.extend(Ember._Metamorph, {
     // to insert keywords, it is responsible for cloning
     // the keywords hash. This will be fixed momentarily.
     var keyword = get(this, 'keyword');
+    var content = get(view, 'content');
 
     if (keyword) {
       var data = get(view, 'templateData');
@@ -19479,14 +19516,28 @@ Ember.Handlebars.EachView = Ember.CollectionView.extend(Ember._Metamorph, {
       data.keywords = view.cloneKeywords();
       set(view, 'templateData', data);
 
-      var content = get(view, 'content');
-
       // In this case, we do not bind, because the `content` of
       // a #each item cannot change.
       data.keywords[keyword] = content;
     }
 
+    // If {{#each}} is looping over an array of controllers,
+    // point each child view at their respective controller.
+    if (content && get(content, 'isController')) {
+      set(view, 'controller', content);
+    }
+
     return view;
+  },
+
+  willDestroy: function() {
+    var arrayController = get(this, '_arrayController');
+
+    if (arrayController) {
+      arrayController.destroy();
+    }
+
+    return this._super();
   }
 });
 
@@ -19677,7 +19728,7 @@ Ember.Handlebars.registerHelper('each', function(path, options) {
     options.hash.eachHelper = 'each';
   }
 
-  options.hash.contentBinding = path;
+  options.hash.dataSourceBinding = path;
   // Set up emptyView as a metamorph with no tag
   //options.hash.emptyViewClass = Ember._MetamorphView;
 
@@ -22259,9 +22310,9 @@ Ember.Router = Ember.Object.extend({
     container.register('view', 'default', DefaultView);
     container.register('view', 'toplevel', Ember.View.extend());
 
-    router.handleURL(location.getURL());
+    this.handleURL(location.getURL());
     location.onUpdateURL(function(url) {
-      router.handleURL(url);
+      self.handleURL(url);
     });
   },
 
@@ -23889,7 +23940,7 @@ Ember.HistoryLocation = Ember.Object.extend({
     @method initState
   */
   initState: function() {
-    this.replaceState(get(this, 'location').pathname);
+    this.replaceState(this.formatURL(this.getURL()));
     set(this, 'history', window.history);
   },
 
@@ -26047,8 +26098,8 @@ Ember States
 
 
 })();
-// Version: v1.0.0-pre.4-31-g16442c5
-// Last commit: 16442c5 (2013-01-23 23:48:09 -0800)
+// Version: v1.0.0-pre.4-51-ge95c992
+// Last commit: e95c992 (2013-01-26 20:37:14 -0800)
 
 
 (function() {

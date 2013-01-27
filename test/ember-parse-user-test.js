@@ -133,3 +133,19 @@ test("Login", function(){
   ok(user.get('isCurrent'), "Should be current user after login.");
   equal(user.get('password'), null, "Be sure that password gets dumped.");
 });
+
+test("Password Reset", function(){
+  store.load(User, {objectId: 'aid8nalX'});
+  user = store.find(User, 'aid8nalX');
+  user.on('resettingPassword', function(){
+    expectUserState('passwordReset');
+  });
+  user.on('didResetPassword', function(){
+    expectUserState('loaded');
+  });
+  user.resetPassword('clint.hill@gmail.com');
+  expectType("POST");
+  expectUrl("/1/requestPasswordReset", "Request password path from Parse.");
+  expectUserState('passwordReset');
+  ajaxHash.success();
+});
