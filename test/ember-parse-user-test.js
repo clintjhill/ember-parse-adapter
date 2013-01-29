@@ -154,3 +154,31 @@ test("Password Reset Request", function(){
   ajaxHash.success();
   expectUserState('loaded');
 });
+
+test("Update (batch) - Session token handling", function(){
+  store.loadMany(User, [
+    {objectId: 'xuF8hlkrg', username: 'clintjhill', email: 'nope@yep.com'},
+    {objectId: 'inol8HFer', username: 'clinthill', email: 'yep@nope.com', sessionToken: 'ivegotasession'}
+  ]);
+  var allowsUpdate = store.find(User, 'inol8HFer');
+  var noUpdates = store.find(User, 'xuF8hlkrg');
+
+  allowsUpdate.set('password', 'notHacked');
+  noUpdates.set('password', 'youGotHacked');
+
+  expectUserState('dirty', true, allowsUpdate);
+  expectUserState('dirty', true, noUpdates);
+
+  store.commit();
+
+  ajaxHash.success({
+    results: [
+      {success: {updatedAt: (new Date()).toISOString()}},
+      {error: {code: 101, error: 'some message'}}
+    ]
+  });
+
+  expectUserState('error', true, noUpdates);
+  expectUserState('loaded', true, allowsUpdate);
+
+});

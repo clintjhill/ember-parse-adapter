@@ -245,12 +245,12 @@ test("Update Record - bulkCommit", function(){
     requests: [
       {
         method: "PUT",
-        path: "/1/classes/Post",
+        path: "/1/classes/Post/post1",
         body: {objectId: 'post1', comments: [], title: 'Post 1 updated.', updatedAt: undefined, createdAt: undefined}
       },
       {
         method: "PUT",
-        path: "/1/classes/Post",
+        path: "/1/classes/Post/post2",
         body: {objectId: 'post2', comments: [], title: 'Post 2 updated.', updatedAt: undefined, createdAt: undefined}
       }
     ]
@@ -307,45 +307,17 @@ test("Delete Record - bulkCommit", function(){
     requests: [
       {
         method: "DELETE",
-        path: "/1/classes/Post",
+        path: "/1/classes/Post/post1",
         body: {objectId: 'post1', comments: [], title: 'Post 1', updatedAt: undefined, createdAt: undefined}
       },
       {
         method: "DELETE",
-        path: "/1/classes/Post",
+        path: "/1/classes/Post/post2",
         body: {objectId: 'post2', comments: [], title: 'Post 2', updatedAt: undefined, createdAt: undefined}
       }
     ]
   });
   ajaxHash.success();
   expectStates(posts, 'saving', false);
-  // TODO: This fails ?!?
-  //expectStates(posts, 'deleted');
   expectStates(posts, 'dirty', false);
-});
-
-test("Extending a batch result from Parse", function(){
-  var results = [
-    {
-      "success": {
-        "createdAt": "2012-06-15T16:59:11.276Z",
-        "objectId": "YAfSAWwXbL"
-      }
-    },
-    {
-      "error": {
-        "code": 101,
-        "error": "object not found for delete"
-      }
-    }
-  ];
-  var records = new Ember.Set([Post.createRecord({title:'Post 1'}), Post.createRecord({title: 'Post 2'})]);
-  var batch = serializer.serializeBatchFor("PUT", records);
-  var extended = adapter.extendRecords(results, batch);
-
-  equal(extended.length, 2, "Should still have 2 records.");
-  equal(extended[0].title, "Post 1", "Should match first post title.");
-  equal(extended[0].objectId, "YAfSAWwXbL", "Should match first post id from results.");
-  equal(extended[1].title, "Post 2", "Should match second post title.");
-  equal(extended[1].objectId, undefined, "Shouldn't have an id due to error.");
 });
