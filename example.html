@@ -17,7 +17,7 @@
 <script src="vendor/ember.js"></script>
 <script src="vendor/ember-data.js"></script>
 
-<script src="dist/ember-parse-adapter-0.2.1.js"></script>
+<script src="dist/ember-parse-adapter-0.2.2.js"></script>
 
 <!-- Example application -->
 
@@ -89,9 +89,13 @@
     parseType: 'Sample'
   });
 
+  ExampleApp.Activity = ParseModel.extend({
+    name: DS.attr('string'),
+    comment: DS.attr('string')
+  });
+
   /*
     Associations
-
   */
   ExampleApp.Playlist = ParseModel.extend({
     name: DS.attr('string'),
@@ -103,24 +107,6 @@
     playlist: DS.belongsTo('ExampleApp.Playlist')
   });
 
-
-  ExampleApp.initialize();
-
-/*  // Create essentially a parent object for the association
-  var playlist = ExampleApp.Playlist.createRecord({name: 'My Rockin tunes'});
-
-  playlist.store.commit();
-
-  // add a song via createRecord
-  playlist.get('songs').createRecord({name: 'Song from createRecord'});
-
-  // create a song all by itself
-  var song = ExampleApp.Song.createRecord({name: 'Song from pushObject'});
-  // add it to the playlist via pushObject
-  playlist.get('songs').pushObject(song);
-
-  playlist.store.commit();
-*/
 </script>
 
 </body>

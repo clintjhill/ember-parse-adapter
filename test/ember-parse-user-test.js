@@ -171,12 +171,10 @@ test("Update (batch) - Session token handling", function(){
 
   store.commit();
 
-  ajaxHash.success({
-    results: [
-      {success: {updatedAt: (new Date()).toISOString()}},
-      {error: {code: 101, error: 'some message'}}
-    ]
-  });
+  ajaxHash.success([
+    {success: {updatedAt: (new Date()).toISOString()}},
+    {error: {code: 101, error: 'some message'}}
+  ]);
 
   expectUserState('error', true, noUpdates);
   expectUserState('loaded', true, allowsUpdate);

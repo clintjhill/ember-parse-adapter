@@ -197,12 +197,10 @@ test("Create Record - bulkCommit", function(){
       }
     ]
   });
-  ajaxHash.success({
-    results: [
-      {success: {objectId: 'post1', createdAt: (new Date()).toISOString()}},
-      {success: {objectId: 'post2', createdAt: (new Date()).toISOString()}}
-    ]
-  });
+  ajaxHash.success([
+    {success: {objectId: 'post1', createdAt: (new Date()).toISOString()}},
+    {success: {objectId: 'post2', createdAt: (new Date()).toISOString()}}
+  ]);
   expectStates(posts, 'saving', false);
   expect(posts[0], store.find(Post, 'post1'), "should match first post.");
   expect(posts[1], store.find(Post, 'post2'), "should match second post.");
@@ -255,12 +253,10 @@ test("Update Record - bulkCommit", function(){
       }
     ]
   });
-  ajaxHash.success({
-    results: [
-      {success: {objectId: 'post1', updatedAt: (new Date()).toISOString()}},
-      {success: {objectId: 'post2', updatedAt: (new Date()).toISOString()}}
-    ]
-  });
+  ajaxHash.success([
+    {success: {objectId: 'post1', updatedAt: (new Date()).toISOString()}},
+    {success: {objectId: 'post2', updatedAt: (new Date()).toISOString()}}
+  ]);
   expectStates(posts, 'saving', false);
   expect(posts[0], store.find(Post, 'post1'), "should match first post.");
   expect(posts[1], store.find(Post, 'post2'), "should match second post.");
