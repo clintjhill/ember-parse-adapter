@@ -25,20 +25,31 @@ Features
 
 ##### ParseModel: Ember Data Model
   * Provides an easy way to setup a Parse object.
+  * Includes new StateManager that includes Parse specific states (Password Reset)
+
+##### ParseUser: Parse User implementation.
+  * Login
+  * Signup
+  * Request password reset
 
 Get Started
 -----------
-Grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.
+First take a look at the example.html file in the root of this project. It includes a very basic implementation of an application. Read the source to understand how the Ember Data Adapter for Parse is configured. You will want to include your Parse acct information from [Parse](https://parse.com) and then you can run that example.html file in a browser.
+
+Or if you prefer to jump right in, grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.
 
 ```html
-<script src="jquery.min.js"></script>
-<script src="handlebars-1.0.rc.1.js"></script>
-<script src="ember.js"></script>
-<script src="ember-data.js"></script>
-<script src="ember-parse-adapter-0.0.9.js"></script>
+<!-- dependencies -->
+<script src="vendor/jquery.min.js"></script>
+<script src="vendor/handlebars-1.0.0-rc.3.js"></script>
+<script src="vendor/ember-1.0.0-rc.1.js"></script>
+<script src="vendor/ember-data.js"></script>
+
+<!-- Parse Data Adapter (latest build) -->
+<script src="dist/ember-parse-adapter-0.2.2.js"></script>
 ```
 
-Next you'll want to get an account at Parse: https://parse.com/. After this you will be provided with three keys:
+Next you'll want to get an account at [Parse](https://parse.com). After this you will be provided with three keys:
 
 * Application ID
 * JavaScript Key
@@ -71,14 +82,13 @@ Once you have your adapter configured now you can create ParseModels just as you
 Issues
 ------
 
-* Demo is rough due to Parse acct dependency.
+* Demo is not out-of-the-box due to Parse acct dependency.
 * findQuery implementation is a bit weak/brittle. Needs full [Parse Query](https://parse.com/docs/rest#queries-constraints).
 * Error conditions are handled only by logging the error.
 
 Roadmap
 -------
 
-* Parse User implementation
 * Parse Roles implementation
 * Parse ACL implementation
 * Parse Relation for many-to-many associations.
