@@ -61,18 +61,30 @@
 
 <ul>
 <li>Provides an easy way to setup a Parse object.</li>
+<li>Includes new StateManager that includes Parse specific states (Password Reset)</li>
+</ul><h5>ParseUser: Parse User implementation.</h5>
+
+<ul>
+<li>Login</li>
+<li>Signup</li>
+<li>Request password reset</li>
 </ul><h2>Get Started</h2>
 
-<p>Grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.</p>
+<p>First take a look at the example.html file in the root of this project. It includes a very basic implementation of an application. Read the source to understand how the Ember Data Adapter for Parse is configured. You will want to include your Parse acct information from <a href="https://parse.com">Parse</a> and then you can run that example.html file in a browser.</p>
 
-<div class="highlight"><pre><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"handlebars-1.0.rc.1.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember-data.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"ember-parse-adapter-0.0.9.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<p>Or if you prefer to jump right in, grab the latest version of ember-parse-adapter from the /dist directory in this project and include it in your HTML after the Ember dependencies.</p>
+
+<div class="highlight"><pre><span class="c">&lt;!-- dependencies --&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"vendor/jquery.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"vendor/handlebars-1.0.0-rc.3.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"vendor/ember-1.0.0-rc.1.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"vendor/ember-data.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Parse Data Adapter (latest build) --&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"dist/ember-parse-adapter-0.2.2.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 </pre></div>
 
-<p>Next you'll want to get an account at Parse: <a href="https://parse.com/">https://parse.com/</a>. After this you will be provided with three keys:</p>
+<p>Next you'll want to get an account at <a href="https://parse.com">Parse</a>. After this you will be provided with three keys:</p>
 
 <ul>
 <li>Application ID</li>
@@ -103,11 +115,14 @@
 <h2>Issues</h2>
 
 <ul>
-<li>Demo is rough due to Parse acct dependency.</li>
+<li>Demo is not out-of-the-box due to Parse acct dependency.</li>
+<li>findQuery implementation is a bit weak/brittle. Needs full <a href="https://parse.com/docs/rest#queries-constraints">Parse Query</a>.</li>
 <li>Error conditions are handled only by logging the error.</li>
 </ul><h2>Roadmap</h2>
 
 <ul>
+<li>Parse Roles implementation</li>
+<li>Parse ACL implementation</li>
 <li>Parse Relation for many-to-many associations.</li>
 <li>Implement Store record error states.</li>
 <li>Implement full type encodings in ParseSerializer supported by Parse (Bytes/Pointer/Relation).</li>
