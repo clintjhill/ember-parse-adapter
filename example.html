@@ -31,6 +31,9 @@
   <li>{{#linkTo home}}Home{{/linkTo}}</a></li>
   <li>{{#linkTo samples}}Samples{{/linkTo}}</a></li>
   <li>{{#linkTo samples.new}}New Sample{{/linkTo}}</a></li>
+  <li>{{#linkTo users}}Users{{/linkTo}}</a></li>
+  <li>{{#linkTo users.signup}}Sign Up{{/linkTo}}</a></li>
+  <li>{{#linkTo users.login}}Login{{/linkTo}}</a></li>
 </ul>
 {{outlet}}
 </script>
@@ -41,7 +44,7 @@
 <ul>
   <!-- Iterate each Sample from the controller samples property -->
   {{#each sample in samples}}
-    <li>{{sample.id}} - {{#linkTo samples.edit sample}}{{sample.name}}{{/linkTo}}</li>
+    <li>{{sample.id}} - {{#linkTo samples.edit sample}}{{sample.name}}{{/linkTo}} (Created: {{sample.createdAt}})</li>
   {{/each}}
 </ul>
 {{outlet}}
@@ -66,6 +69,32 @@
   <label for="exampleName">Name:</label>
   <input type="text" name="exampleName" id="exampleName" {{bindAttr value="name"}} />
   <button type="submit">Save!</button>
+</form>
+</script>
+
+<!-- Template for Users -->
+<script type="text/x-handlebars" data-template-name="users">
+<h2>Users</h2>
+<ul>
+  {{#each user in content}}
+    <li>{{user.id}} - {{user.username}} (Created: {{user.createdAt}})</li>
+  {{/each}}
+</ul>
+{{outlet}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="users/signup">
+<h3>User Sign Up</h3>
+<form action="#">
+<p>
+  <label for="usename">Username:</label>
+  <input type="text" name="username" id="username" value="" />
+</p>
+<p>
+  <label for="password">Password:</label>
+  <input type="password" name="password" id="password" value="" />
+</p>
+<p><button type="submit">Sign Up!</button></p>
 </form>
 </script>
 
@@ -101,6 +130,10 @@
       this.route('new');
       this.route('edit', {path: '/samples/:sample_id'});
     });
+    this.resource('users', { path: '/users' }, function() {
+      this.route('login');
+      this.route('signup');
+    });
   });
 
   /*
@@ -110,6 +143,15 @@
   ExampleApp.SamplesRoute = Ember.Route.extend({
     setupController: function(controller) {
       controller.set('samples', ExampleApp.SampleModel.find());
+    }
+  });
+
+  /*
+    A more typical use of the setupController hook.
+   */
+  ExampleApp.UsersRoute = Ember.Route.extend({
+    setupController: function(controller){
+      controller.set('content', ExampleApp.SampleUser.find());
     }
   });
 
@@ -138,6 +180,20 @@
   });
 
   /*
+    SampleUser Sign Up form. Handles the submission of a User signup
+    by creating a new Parse User.
+   */
+  ExampleApp.UsersSignupView = Ember.View.extend({
+    submit: function(evt){
+      var user = ExampleApp.SampleUser.createRecord();
+      user.set('username', this.$('input[name=username]').val());
+      user.set('password', this.$('input[name=password]').val());
+      user.signup();
+      return false;
+    }
+  });
+
+  /*
     Create a sample Model that implements a Parse Mixin.
     This will create a model that will have the following attributes:
 
@@ -157,6 +213,19 @@
   */
   ExampleApp.SampleModel.reopenClass({
     parseType: 'Sample'
+  });
+
+  /*
+    An example of using the ParseUser.
+    This will create a model that will have the following attibutes:
+
+      - string field named username
+      - string field named email
+      - string field named password
+      - string field named sessionToken
+   */
+  ExampleApp.SampleUser = ParseUser.extend({
+    // you could extend addtl fields like any other model.
   });
 
 </script>
