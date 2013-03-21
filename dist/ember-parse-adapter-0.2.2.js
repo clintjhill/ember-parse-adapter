@@ -641,7 +641,7 @@ var ParseUser = DS.ParseUser = ParseModel.extend({
     data = adapter.get('serializer').serialize(this);
 
     adapter.request("GET", ParseUser.toString(), data, {
-      url: "login",
+      url: "login?%@".fmt($.param({username: data.username, password: data.password})),
       success: function(result){
         Ember.run(adapter, function(){
           // dump the password
