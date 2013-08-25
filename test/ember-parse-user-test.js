@@ -120,7 +120,7 @@ test("Login", function(){
   user.login({username: 'clint', password: 'loveyouall'});
   expectUserState('dirty');
   expectUserState('new');
-  expectUrl("/1/login");
+  expectUrl("/1/login?username=clint&password=loveyouall");
   expectType("GET");
   ajaxHash.success({
     "username": "clint",
