@@ -317,3 +317,10 @@ test("Delete Record - bulkCommit", function(){
   expectStates(posts, 'saving', false);
   expectStates(posts, 'dirty', false);
 });
+
+test("Date Serialization", function(){
+  var date = new Date(946684800000);
+  var serialzedDate = serializer.serializeValue(date, 'date');
+  equal(serialzedDate.iso, '2000-01-01T00:00:00.000Z', 'The ISO value is correct')
+  equal(serialzedDate['__type'], 'Date', 'The type is correct')
+});
