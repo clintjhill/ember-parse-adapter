@@ -98,9 +98,9 @@ test("Find", function(){
 test("Login", function(){
   user = store.createRecord(User);
   user.login({username: 'clint', password: 'loveyouall'});
-  expectState('dirty');
-  expectState('new');
-  expectUrl("/1/login");
+  expectUserState('dirty');
+  expectUserState('new');
+  expectUrl("/1/login?username=clint&password=loveyouall");
   expectType("GET");
   ajaxHash.success({
     "username": "clint",
