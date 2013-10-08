@@ -12,7 +12,6 @@ module("Ember Data Adapter for Parse: Serializer", {
     serializer = get(adapter, 'serializer');
 
     store = DS.Store.create({
-      revision: 11,
       adapter: adapter
     });
 
@@ -37,9 +36,11 @@ module("Ember Data Adapter for Parse: Serializer", {
   },
 
   teardown: function() {
-    adapter.destroy();
-    store.destroy();
-    App.destroy();
+    Ember.run(function(){
+      adapter.destroy();
+      store.destroy();
+      App.destroy();
+    });
   }
 });
 

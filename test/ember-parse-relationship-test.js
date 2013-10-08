@@ -14,7 +14,6 @@ module("Ember Data Adapter for Parse: Relationships", {
     serializer = get(adapter, 'serializer');
 
     store = DS.Store.create({
-      revision: 11,
       adapter: adapter
     });
 

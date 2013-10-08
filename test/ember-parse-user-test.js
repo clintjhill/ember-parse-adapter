@@ -31,7 +31,6 @@ module("Ember Data Adapter for Parse: User", {
     serializer = get(adapter, 'serializer');
 
     store = DS.Store.create({
-      revision: 11,
       adapter: adapter
     });
 
@@ -51,32 +50,13 @@ module("Ember Data Adapter for Parse: User", {
   }
 });
 
-var expectUrl = function(url, desc) {
-  // because the Parse API is CORS and we have a server URL ...
-  equal(ajaxUrl, adapter.serverUrl + url, "the URL is " + desc);
-};
-
-var expectType = function(type) {
-  equal(ajaxType, type, "the HTTP method is " + type);
-};
-
-var expectData = function(hash) {
-  deepEqual(ajaxHash.data, hash, "the hash was passed along");
-};
-
-var expectUserState = function(state, value, u) {
-  u = u || user;
-  if (value === undefined) { value = true; }
-  var flag = "is" + state.charAt(0).toUpperCase() + state.substr(1);
-  equal(get(u, flag), value, "the user is " + (value === false ? "not " : "") + state);
-};
 
 test("Signup", function(){
   user = store.createRecord(User, {name: 'Clint'});
-  expectUserState('dirty');
-  expectUserState('new');
+  expectState('dirty');
+  expectState('new');
   user.signup({username: 'clintjhill', password: 'loveyouall'});
-  expectUserState('saving');
+  expectState('saving');
   expectUrl("/1/users");
   expectType("POST");
   expectData({
@@ -93,8 +73,8 @@ test("Signup", function(){
     "objectId": "g7y9tkhB7O",
     "sessionToken": "pnktnjyb996sj4p156gjtp4im"
   });
-  expectUserState('saving', false);
-  expectUserState('dirty', false);
+  expectState('saving', false);
+  expectState('dirty', false);
   equal(user.get('id'), 'g7y9tkhB7O', "Be sure objectId is set.");
   equal(user.get('password'), null, "Be sure that password gets dumped.");
   equal(user.get('sessionToken'), 'pnktnjyb996sj4p156gjtp4im', "Make sure session token set.");
@@ -103,7 +83,7 @@ test("Signup", function(){
 
 test("Find", function(){
   user = store.find(User, 'h8mgfgL1yS');
-  expectUserState('loaded', false);
+  expectState('loaded', false);
   expectUrl("/1/users/h8mgfgL1yS");
   expectType('GET');
   ajaxHash.success({
@@ -111,15 +91,15 @@ test("Find", function(){
     "objectId": "h8mgfgL1yS",
     "username": "clintjhill"
   });
-  expectUserState('loaded');
+  expectState('loaded');
   equal(user.get('isCurrent'), false, "User should not be current during a find.");
 });
 
 test("Login", function(){
   user = store.createRecord(User);
   user.login({username: 'clint', password: 'loveyouall'});
-  expectUserState('dirty');
-  expectUserState('new');
+  expectState('dirty');
+  expectState('new');
   expectUrl("/1/login");
   expectType("GET");
   ajaxHash.success({
@@ -129,7 +109,7 @@ test("Login", function(){
     "objectId": "g7y9tkhB7O",
     "sessionToken": "pnktnjyb996sj4p156gjtp4im"
   });
-  expectUserState('loaded');
+  expectState('loaded');
   ok(user.get('isCurrent'), "Should be current user after login.");
   equal(user.get('password'), null, "Be sure that password gets dumped.");
 });
@@ -140,19 +120,19 @@ test("Password Reset Request", function(){
   // expected events
   user.on('requestingPasswordReset', function(){
     // while password reset request is being sent
-    expectUserState('passwordResetting');
+    expectState('passwordResetting');
   });
   user.on('didRequestPasswordReset', function(){
     // password reset request happened
-    expectUserState('loaded');
+    expectState('loaded');
   });
   // reset it
   user.requestPasswordReset('clint.hill@gmail.com');
   expectType("POST");
   expectUrl("/1/requestPasswordReset", "Request password path from Parse.");
-  expectUserState('passwordResetting');
+  expectState('passwordResetting');
   ajaxHash.success();
-  expectUserState('loaded');
+  expectState('loaded');
 });
 
 test("Update (batch) - Session token handling", function(){
@@ -166,8 +146,8 @@ test("Update (batch) - Session token handling", function(){
   allowsUpdate.set('password', 'notHacked');
   noUpdates.set('password', 'youGotHacked');
 
-  expectUserState('dirty', true, allowsUpdate);
-  expectUserState('dirty', true, noUpdates);
+  expectState('dirty', true, allowsUpdate);
+  expectState('dirty', true, noUpdates);
 
   store.commit();
 
@@ -176,7 +156,7 @@ test("Update (batch) - Session token handling", function(){
     {error: {code: 101, error: 'some message'}}
   ]);
 
-  expectUserState('error', true, noUpdates);
-  expectUserState('loaded', true, allowsUpdate);
+  expectState('error', true, noUpdates);
+  expectState('loaded', true, allowsUpdate);
 
 });

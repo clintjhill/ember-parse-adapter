@@ -59,6 +59,6 @@ module.exports = function(grunt){
   grunt.registerTask('test', ['connect', 'qunit']);
   // removed test from the default because it's current failing with out-of-memory errors.
   // TESTS pass if run in browsers.
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'test']);
 
 };
