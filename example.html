@@ -15,99 +15,24 @@
 <body>
 
 <!-- dependencies -->
-<script src="vendor/jquery.min.js"></script>
-<script src="vendor/handlebars-1.0.0-rc.3.js"></script>
-<script src="vendor/ember-1.0.0-rc.1.js"></script>
-<script src="vendor/ember-data-latest.js"></script>
+<script src="vendor/jquery-1.10.2.min.js"></script>
+<script src="vendor/handlebars-1.0.0.js"></script>
+<script src="http://builds.emberjs.com/canary/ember.js"></script>
+<script src="http://builds.emberjs.com/canary/ember-data.js"></script>
 
 <!-- Parse Data Adapter (latest build) -->
-<script src="dist/ember-parse-adapter-0.2.2.js"></script>
+<script src="dist/ember-parse-adapter-0.4.0.js"></script>
 
-
-<!-- Template for the Application -->
-<script type="text/x-handlebars" data-template-name="application">
-<h1>Example for Ember Data Adapter for Parse</h1>
-<ul class="inline">
-  <li>{{#linkTo home}}Home{{/linkTo}}</a></li>
-  <li>{{#linkTo samples}}Samples{{/linkTo}}</a></li>
-  <li>{{#linkTo samples.new}}New Sample{{/linkTo}}</a></li>
-  <li>{{#linkTo users}}Users{{/linkTo}}</a></li>
-  <li>{{#linkTo users.signup}}Sign Up{{/linkTo}}</a></li>
-  <li>{{#linkTo users.login}}Login{{/linkTo}}</a></li>
-</ul>
-{{outlet}}
-</script>
-
-<!-- Template for the Samples -->
-<script type="text/x-handlebars" data-template-name="samples">
-<h2>Samples</h2>
-<ul>
-  <!-- Iterate each Sample from the controller samples property -->
-  {{#each sample in samples}}
-    <li>{{sample.id}} - {{#linkTo samples.edit sample}}{{sample.name}}{{/linkTo}} (Created: {{sample.createdAt}})</li>
-  {{/each}}
-</ul>
-{{outlet}}
-</script>
-
-<!-- Template for a New Sample -->
-<script type="text/x-handlebars" data-template-name="samples/new">
-<h3>New Sample</h3>
-<form action="#">
-  <label for="exampleName">Name:</label>
-  <input type="text" name="exampleName" id="exampleName" value="" />
-  <button type="submit">Save!</button>
-</form>
-</script>
-
-<!-- Template for Editing a Sample -->
-<script type="text/x-handlebars" data-template-name="samples/edit">
-<h3>Edit Sample</h3>
-<form action="#">
-  <label for="exampleId">ID:</label>
-  <input type="text" disabled name="exampleId" {{bindAttr value="id"}} />
-  <label for="exampleName">Name:</label>
-  <input type="text" name="exampleName" id="exampleName" {{bindAttr value="name"}} />
-  <button type="submit">Save!</button>
-</form>
-</script>
-
-<!-- Template for Users -->
-<script type="text/x-handlebars" data-template-name="users">
-<h2>Users</h2>
-<ul>
-  {{#each user in content}}
-    <li>{{user.id}} - {{user.username}} (Created: {{user.createdAt}})</li>
-  {{/each}}
-</ul>
-{{outlet}}
-</script>
-
-<script type="text/x-handlebars" data-template-name="users/signup">
-<h3>User Sign Up</h3>
-<form action="#">
-<p>
-  <label for="usename">Username:</label>
-  <input type="text" name="username" id="username" value="" />
-</p>
-<p>
-  <label for="password">Password:</label>
-  <input type="password" name="password" id="password" value="" />
-</p>
-<p><button type="submit">Sign Up!</button></p>
-</form>
-</script>
 
 <script>
 
   // Create an Ember application
-  var ExampleApp = Ember.Application.create();
+  var ExampleApp = new Ember.Container();
 
   // Add a Data Store to the application that implements a Parse Adapter.
   // Be sure to provide your Parse Acct IDs to initialize the connection.
-  ExampleApp.Store = DS.Store.extend({
-    revision: 11,
-    adapter: ParseAdapter.create({
+  ExampleApp.register('store:main', DS.Store.extend({
+    adapter: DS.ParseAdapter.create({
       applicationId: '',
       restApiId: '',
       javascriptId: ''
@@ -119,114 +44,7 @@
       //  versionPath: "1",
       //  modelPath: "classes",
     })
-  });
-
-  /*
-    Typical Ember Application Router.
-   */
-  ExampleApp.Router.map(function(){
-    this.route("home", {path: "/"});
-    this.resource('samples', { path: '/samples' }, function() {
-      this.route('new');
-      this.route('edit', {path: '/samples/:sample_id'});
-    });
-    this.resource('users', { path: '/users' }, function() {
-      this.route('login');
-      this.route('signup');
-    });
-  });
-
-  /*
-    We've over-written the SamplesRoute so that we can create a 'samples'
-    property for better clarity in the templates.
-   */
-  ExampleApp.SamplesRoute = Ember.Route.extend({
-    setupController: function(controller) {
-      controller.set('samples', ExampleApp.SampleModel.find());
-    }
-  });
-
-  /*
-    A more typical use of the setupController hook.
-   */
-  ExampleApp.UsersRoute = Ember.Route.extend({
-    setupController: function(controller){
-      controller.set('content', ExampleApp.SampleUser.find());
-    }
-  });
-
-  /*
-    SampleModel form view. Handles the submission of the newly
-    added Sample to persist to Parse.com
-   */
-  ExampleApp.SamplesNewView = Ember.View.extend({
-    submit: function(evt){
-      var sample = ExampleApp.SampleModel.createRecord();
-      sample.set('name', this.$('input[name=exampleName]').val());
-      // This is now going to persist the new Sample to Parse.com
-      sample.get('store').commit();
-      return false;
-    }
-  });
-
-  ExampleApp.SamplesEditView = Ember.View.extend({
-    submit: function(evt){
-      var sample = this.get('controller.model');
-      sample.set('name', this.$('input[name=exampleName]').val());
-      // This is now going to persist the edited Sample to Parse.com
-      sample.get('store').commit();
-      return false;
-    }
-  });
-
-  /*
-    SampleUser Sign Up form. Handles the submission of a User signup
-    by creating a new Parse User.
-   */
-  ExampleApp.UsersSignupView = Ember.View.extend({
-    submit: function(evt){
-      var user = ExampleApp.SampleUser.createRecord();
-      user.set('username', this.$('input[name=username]').val());
-      user.set('password', this.$('input[name=password]').val());
-      user.signup();
-      return false;
-    }
-  });
-
-  /*
-    Create a sample Model that implements a Parse Mixin.
-    This will create a model that will have the following attributes:
-
-      - primaryKey = 'objectId'
-      - date field named createdAt
-      - date field named updatedAt
-      - string field named name
-      - will be saved as a 'SampleModel' class
-  */
-  ExampleApp.SampleModel = ParseModel.extend({
-    name: DS.attr('string')
-  });
-
-  /*
-    If you wish to not use the name 'SampleModel' for the class, set it with parseType
-    and that will be used as the class name on Parse.
-  */
-  ExampleApp.SampleModel.reopenClass({
-    parseType: 'Sample'
-  });
-
-  /*
-    An example of using the ParseUser.
-    This will create a model that will have the following attibutes:
-
-      - string field named username
-      - string field named email
-      - string field named password
-      - string field named sessionToken
-   */
-  ExampleApp.SampleUser = ParseUser.extend({
-    // you could extend addtl fields like any other model.
-  });
+  }));
 
 </script>
 
