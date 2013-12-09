@@ -183,6 +183,11 @@ var ParseUserModel = DS.ParseUserModel = ParseModel.extend({
     }
   },
 
+  /**
+   * Sign up functionality. The afterSignUp callback will be called
+   * with a data object that either has the sign up details
+   * (session token, username, objectId) or the error details.
+   */
   signUp: function(afterSignUp){
     var instance = this;
     var adapter = this.get('store').get('defaultAdapter');
@@ -194,7 +199,7 @@ var ParseUserModel = DS.ParseUserModel = ParseModel.extend({
     adapter.ajax(adapter.buildURL(this.constructor.typeKey), "POST", {data: newUser}).then(
       function(data){
         instance._persist(data);
-        afterSignuUp(data);
+        afterSignUp(data);
       },
       function(data){
         instance._persist(null);
@@ -203,6 +208,11 @@ var ParseUserModel = DS.ParseUserModel = ParseModel.extend({
     );
   },
 
+  /**
+   * Login functionality. The afterLogin callback will be called
+   * with a data object that either has the login details
+   * (session token, username, objectId) or the error details.
+   */
   login: function(afterLogin){
     var instance = this;
     var adapter = this.get('store').get('defaultAdapter');
