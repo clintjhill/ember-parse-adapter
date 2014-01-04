@@ -25,14 +25,16 @@ var ParseAdapter = DS.ParseAdapter = DS.RESTAdapter.extend({
   buildURL: function(type, id){
     var url = this._super(type, id);
     var model = this.container.lookupFactory("model:" + type);
-    var includes = [];
-    model.eachRelationship(function(key, relationship){
-      if(relationship.kind === "hasMany" && !relationship.options.relation){
-        includes.push(key);
+    if(model){
+      var includes = [];
+      model.eachRelationship(function(key, relationship){
+        if(relationship.kind === "hasMany" && !relationship.options.relation){
+          includes.push(key);
+        }
+      });
+      if(includes.length > 0){
+        url = url + "?include=" + includes.join(",");
       }
-    });
-    if(includes.length > 0){
-      url = url + "?include=" + includes.join(",");
     }
     return url;
   },
@@ -416,14 +418,14 @@ ParseUserModel.reopenClass({
     return new Ember.RSVP.Promise(function(resolve, reject){
       adapter.ajax(adapter.buildURL("login"), "GET", {data: user}).then(
         function(data){
-          serializer.normalizeId(data);
+          serializer.normalize(model, data);
           data.currentUser = true;
-          store.push(model.typeKey, data);
+          var record = store.push(model.typeKey, data);
           ParseUserModel._setCurrent(adapter, data);
-          resolve(store.find(model.typeKey, data.id));
+          resolve(record);
         },
         function(data){
-          ParseUserModel._persist(adapter, null);
+          ParseUserModel._setCurrent(adapter, null);
           reject(data.responseJSON); 
         }
       );
@@ -442,16 +444,16 @@ ParseUserModel.reopenClass({
     return new Ember.RSVP.Promise(function(resolve, reject){
       adapter.ajax(adapter.buildURL(model.typeKey), "POST", {data: newUser}).then(
         function(data){
-          serializer.normalizeId(data);
+          serializer.normalize(model, data);
           data.currentUser = true;
           data.email = email;
           data.username = username;
-          store.push(model.typeKey, data);
+          var record = store.push(model.typeKey, data);
           ParseUserModel._setCurrent(adapter, data);
-          resolve(store.find(model.typeKey, data.id));
+          resolve(record);
         },
         function(data){
-          ParseUserModel._persist(adapter, null);
+          ParseUserModel._setCurrent(adapter, null);
           reject(data.responseJSON); 
         }
       );
