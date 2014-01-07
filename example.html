@@ -1,52 +1,406 @@
 <!doctype html>
 <html>
 <head>
-  <title>Ember Data Adapter for Parse Example</title>
-  <style>
-    body {
-      font: 14px Helvetica, Arial, sans-serif;
-    }
-    ul.inline li {
-      margin: 2px 10px;
-      display: inline-block;
-    }
-  </style>
+  <title>Ember Data Adapter for Parse -- Example</title>
+  <link rel="stylesheet" href="vendor/foundation.min.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
 </head>
 <body>
 
+  <script type="text/x-handlebars" data-template-name="application">
+    <nav class="top-bar" data-topbar>
+      <ul class="title-area">
+        <li class="name">
+          <h1>{{#link-to 'index'}}Ember Data Adapter for Parse{{/link-to}}</h1>
+        </li>
+        <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+      </ul>
+      <section class="top-bar-section">
+        <ul class="right">
+          <li>{{#link-to 'simple'}}Simple Model{{/link-to}}</li>
+          <li>{{#link-to 'belongsto'}}Belongs To Model{{/link-to}}</li>
+          <li>{{#link-to 'hasmany'}}Has Many Model{{/link-to}}</li>
+          <li>{{#link-to 'login'}}Login{{/link-to}}</li>
+          <li>{{#link-to 'signup'}}Sign Up{{/link-to}}</li>
+        </ul>
+      </section>
+    </nav>
+    <div class="row">
+      <div class="small-12 columns">
+        <h3 class="subheader">Ember Data Adapter for Parse is an adapter built specifically to use with the Parse.com REST API.</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Use the source of this HTML page for the example code.</p>
+      </div>
+    </div>
+    {{outlet}}
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="simple">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Simple Model</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Simple Model.</p>
+        <form>
+          <div>
+            <label for="firstName">Name</label>
+            {{input name="simple" value=name placeholder="Simple Object"}}
+          </div>
+          <div>
+            <button {{action 'save'}}>Save</button>
+          </div>
+        </form>
+        {{#if succeeded}}
+          <div data-alert class="alert-box success radius">
+            Successfully saved Simple Model.
+            <a {{action 'reset'}} class="close">&times;</a>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="belongsto">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Belongs To Model</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Belongs To Model.</p>
+        <form>
+          <div>
+            <label for="donutFlavor">Donut Flavor</label>
+            <select id="donutFlavor">
+              <option value="glazed">Glazed</option>
+              <option value="chocolate">Chocolate</option>
+            </select>
+          </div>
+          <div>
+            <button {{action 'save'}}>Save</button>
+          </div>
+        </form>
+        {{#if succeeded}}
+          <div data-alert class="alert-box success radius">
+            Successfully saved Belongs To Model.
+            <a {{action 'reset'}} class="close">&times;</a>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="hasmany">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Has Many Model</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Has Many Model.</p>
+        {{#if saved}}
+        <button {{action 'add'}}>Add a Stripe</button>
+        {{else}}
+        <form>
+          <div>
+            <label for="tigerName">Name</label>
+            {{input value=name id="tigerName" placeholder="Tigra"}}
+          </div>
+          <div>
+            <button {{action 'save'}}>Save</button>
+          </div>
+        </form>
+        {{/if}}
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="signup">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Sign up</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Sign up.</p>
+        {{#if loggedIn}}
+          <div data-alert class="alert-box success radius">
+            <p>Successfully Signed Up.</p>
+            <p>{{username}} {{loginMessage}}</p>
+            <a href="#" class="close">&times;</a>
+          </div>
+        {{else}}
+        <form>
+          <div>
+            <label for="username">Name</label>
+            {{input value=username id="username" placeholder="happydev"}}
+          </div>
+          <div>
+            <label for="password">Password</label>
+            {{input value=password id="password"}}
+          </div>
+          <div>
+            <label for="email">Email</label>
+            {{input value=email id="email" placeholder="happydev@happyco.com"}}
+          </div>
+          <div>
+            <button {{action 'signup'}}>Save</button>
+          </div>
+        {{#if loginMessage}}
+          <div data-alert class="alert-box warning radius">
+            <p>{{loginMessage}}</p>
+            <a href="#" class="close">&times;</a>
+          </div>
+        {{/if}}
+        </form>
+        {{/if}}
+      </div>
+    </div>
+  </script>
+  <script type="text/x-handlebars" data-template-name="login">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Login</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Login.</p>
+        {{#if loggedIn}}
+          <div data-alert class="alert-box success radius">
+            <p>Successfully Logged in.</p>
+            <p>{{username}} {{loginMessage}}</p>
+            <a href="#" class="close">&times;</a>
+          </div>
+        {{else}}
+        <form>
+          <div>
+            <label for="username">Name</label>
+            {{input value=username id="username" placeholder="happydev"}}
+          </div>
+          <div>
+            <label for="password">Password</label>
+            {{input value=password id="password"}}
+          </div>
+          <div>
+            <button {{action 'login'}}>Save</button>
+          </div>
+        {{#if loginMessage}}
+          <div data-alert class="alert-box warning radius">
+            <p>{{loginMessage}}</p>
+            <a href="#" class="close">&times;</a>
+          </div>
+        {{/if}}
+        </form>
+        {{/if}}
+      </div>
+    </div>
+  </script>
 <!-- dependencies -->
-<script src="vendor/jquery-1.10.2.min.js"></script>
-<script src="vendor/handlebars-1.0.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="vendor/handlebars-v1.3.0.js"></script>
 <script src="http://builds.emberjs.com/canary/ember.js"></script>
 <script src="http://builds.emberjs.com/canary/ember-data.js"></script>
-
 <!-- Parse Data Adapter (latest build) -->
-<script src="dist/ember-parse-adapter-0.4.0.js"></script>
-
-
+<script src="dist/ember-parse-adapter-0.4.17.js"></script>
+<script src="vendor/foundation.min.js"></script>
 <script>
 
   // Create an Ember application
-  var ExampleApp = new Ember.Container();
+  var App = Ember.Application.create();
+  // Create the ApplicationAdapter with Parse
+  App.ApplicationAdapter = DS.ParseAdapter.extend({
+    applicationId: 'Hf7dgrv4WPBcJYUsLgDMZCwKxf3hdbAc1nnSsVza',
+    restApiId: 'BH0IoMxroXSVU3GTMQTVaM4BXjvdX7lKtFujgvzO',
+    javascriptId: 'QGgSQetb7sLuKAuYsgLkCpHqt0TjqJNLcTSv7xHL'
+  });
 
-  // Add a Data Store to the application that implements a Parse Adapter.
-  // Be sure to provide your Parse Acct IDs to initialize the connection.
-  ExampleApp.register('store:main', DS.Store.extend({
-    adapter: DS.ParseAdapter.create({
-      applicationId: '',
-      restApiId: '',
-      javascriptId: ''
-      /*
-        You could configure even further but for the moment these are
-        pretty static. In the event Parse updates it's version path etc.
-      */
-      //  serverUrl: "https://api.parse.com",
-      //  versionPath: "1",
-      //  modelPath: "classes",
-    })
-  }));
+  App.Router.map(function(){
+    this.route('simple');
+    this.route('belongsto');
+    this.route('hasmany');
+    this.route('login');
+    this.route('signup');
+  });
 
+  
+  // === Simple Model 
+  App.SimpleRoute = Ember.Route.extend({
+    model: function(){
+      return this.get('store').createRecord('simple');
+    }
+  });
+
+  App.SimpleController = Ember.Controller.extend({
+    succeeded: false,
+    name: null,
+    actions: {
+      reset: function(){
+        this.set('name', null);
+        this.set('succeeded', false);
+      },
+      save: function(){
+        var controller = this;
+        this.get('model').set('name', this.get('name'));
+        this.get('model').save().then(
+          function(simple){
+            controller.set('succeeded', true);
+          },
+          function(error){
+            controller.set('succeeded', false);
+          }
+        );
+      }
+    }
+  });
+
+  App.Simple = DS.ParseModel.extend({
+    name: DS.attr('string')
+  });
+  // === End of Simple Model
+
+
+  // === Belongs To Model
+  App.BelongstoRoute = Ember.Route.extend({
+    model: function(){
+      return this.get('store').createRecord('donut');
+    }
+  });
+  App.BelongstoController = Ember.Controller.extend({
+    actions: {
+      save: function(){
+        var controller = this;
+        var flavor = $("#donutFlavor").val();
+        this.get('model').set('flavor', flavor);
+        var donut = this.get('model');
+        var hole = this.get('store').createRecord('hole');
+        donut.save().then(function(donut){;
+          hole.set('donut', donut);
+          hole.save().then(function(hole){
+            donut.set('hole', hole);
+            donut.save();
+          });
+        });
+      }
+    }
+  });
+  App.Donut = DS.ParseModel.extend({
+    flavor: DS.attr('string'),
+    hole: DS.belongsTo('hole')
+  });
+  App.Hole = DS.ParseModel.extend({
+    donut: DS.belongsTo('donut')
+  });
+  // === End of Belongs To Model
+
+
+  // === Has Many Model
+  App.HasmanyRoute = Ember.Route.extend({
+    model: function(){
+      return this.get('store').createRecord('tiger');
+    }
+  });
+  App.HasmanyController = Ember.Controller.extend({
+    saved: false,
+    name: null,
+    actions: {
+      save: function(){
+        var controller = this;
+        var name = this.get('name');
+        var tiger = this.get('model');
+        tiger.set('name', name);
+        tiger.save().then(function(tiger){
+          controller.set('saved', true); 
+        });
+      },
+      add: function(){
+        var tiger = this.get('model');
+        var stripe = tiger.get('stripes').createRecord();
+        stripe.save().then(function(stripe){
+          tiger.save();
+        });
+      }
+    }
+  });
+  App.Tiger = DS.ParseModel.extend({
+    name: DS.attr('string'),
+    stripes: DS.hasMany('stripe')
+  });
+  App.Stripe = DS.ParseModel.extend({
+    tiger: DS.belongsTo('tiger')
+  });
+  // === End Has Many Model
+
+  // === User for both Login and Signup
+  App.User = DS.ParseUserModel.extend({
+
+  });
+  // === End User
+
+  // === Login 
+  App.LoginController = Ember.Controller.extend({
+    username: null,
+    password: null,
+    loggedIn: false,
+    loginMessage: null,
+    actions: {
+      login: function(){
+        var controller = this;
+        DS.ParseUserModel.login(this.get('username'), this.get('password')).then(
+          function(user){
+            controller.set('loggedIn', true);
+            controller.set('loginMessage', "Welcome!");
+          },
+          function(error){
+            controller.set('loggedIn', false);
+            controller.set('loginMessage', error.error);
+          }
+        );
+      }
+    }
+  });
+  // === End Login
+
+
+  // === Sign up 
+  App.SignupController = Ember.Controller.extend({
+    username: null,
+    password: null,
+    email: null,
+    loggedIn: false,
+    loginMessage: null,
+    actions: {
+      signup: function(){
+        var controller = this;
+        App.User.signup(this.get('username'), this.get('password'), this.get('email')).then(
+          function(user){
+            controller.set('loggedIn', true);
+            controller.set('loginMessage', "Welcome!");
+          },
+          function(error){
+            controller.set('loggedIn', false);
+            controller.set('loginMessage', error.error);
+          }
+        );
+      }
+    }
+  });
+  // === End Sign up 
 </script>
 
+<script>
+  $(document).ready(function(){
+    $(document).foundation();
+  });
+</script>
 </body>
 </html>

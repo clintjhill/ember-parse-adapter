@@ -10,9 +10,14 @@ DS.hasMany = function(type, options){
     type = undefined;
   }
   // this is a bit of magic to assure async Relation
-  // queries against Parse.
-  if(options.relation && !options.async){
-    options.async = true;
+  // queries against Parse and that if no options provided
+  // array is used as default.
+  if(options){
+    if(options.relation && !options.async){
+      options.async = true;
+    }
+  } else {
+    options = {array:true};
   }
   return overriddenHasMany(type, options);
 };
@@ -214,7 +219,7 @@ var ParseSerializer = DS.ParseSerializer = DS.RESTSerializer.extend({
           hash.links[key] = {type: relationship.type, key: key};
         }
 
-        if(options.array || options.arrayUnique){
+        if(options.array){
           // Parse will return [null] for empty relationships
           if(hash[key].length && hash[key]){
             hash[key].forEach(function(item, index, items){
