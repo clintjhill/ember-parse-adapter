@@ -3,12 +3,16 @@ Ember Data Adapter for Parse
 
 An [Ember Data Adapter](https://github.com/emberjs/data) built to use the [Parse REST API](https://parse.com/docs/rest). This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK. 
 
+Examples
+--------
+There is an example of all of the features inside the [example.html](example.html) file.
+
 Features
 --------
 
 ##### ParseJSONSerializer: Ember Data JSONSerializer
   * Provides the translation of objectId to id for identity mapping.
-  * Provides encoding of hasMany associations to [Parse Pointer objects](https://parse.com/docs/rest#objects-types).
+  * Provides encoding of hasMany associations to arrays of [Parse Pointer objects](https://parse.com/docs/rest#objects-types) or optionally as [Parse Relation objects](https://parse.com/docs/relations_guide).
 
 ##### ParseAdapter: Ember Data Adapter
   * Implements the persistence layer to Parse by extending the Ember Data REST Adapter.
@@ -55,7 +59,6 @@ Roadmap
 
 * Parse Roles implementation
 * Parse ACL implementation
-* Parse Relation for many-to-many associations.
 
 Dev Notes
 ---------
