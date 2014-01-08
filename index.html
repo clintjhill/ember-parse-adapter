@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -15,23 +16,29 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Ember Parse Adapter</h1>
-        <p>An Ember Data Adapter for Parse</p>
-
-        <p class="view"><a href="https://github.com/clintjhill/ember-parse-adapter">View the Project on GitHub <small>clintjhill/ember-parse-adapter</small></a></p>
-
+        <h1 class="header">Ember Parse Adapter</h1>
+        <p class="header">An Ember Data Adapter for Parse</p>
 
         <ul>
-          <li><a href="https://github.com/clintjhill/ember-parse-adapter/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/clintjhill/ember-parse-adapter/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/clintjhill/ember-parse-adapter">View On <strong>GitHub</strong></a></li>
+          <li class="download"><a class="buttons" href="https://github.com/clintjhill/ember-parse-adapter/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/clintjhill/ember-parse-adapter/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/clintjhill/ember-parse-adapter">View On GitHub</a></li>
         </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/clintjhill">clintjhill</a></p>
+
+
       </header>
       <section>
         <h1>
 <a name="ember-data-adapter-for-parse" class="anchor" href="#ember-data-adapter-for-parse"><span class="octicon octicon-link"></span></a>Ember Data Adapter for Parse</h1>
 
 <p>An <a href="https://github.com/emberjs/data">Ember Data Adapter</a> built to use the <a href="https://parse.com/docs/rest">Parse REST API</a>. This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK. </p>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<p>There is an example of all of the features inside the <a href="example.html">example.html</a> file.</p>
 
 <h2>
 <a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
@@ -41,7 +48,7 @@
 
 <ul>
 <li>Provides the translation of objectId to id for identity mapping.</li>
-<li>Provides encoding of hasMany associations to <a href="https://parse.com/docs/rest#objects-types">Parse Pointer objects</a>.</li>
+<li>Provides encoding of hasMany associations to arrays of <a href="https://parse.com/docs/rest#objects-types">Parse Pointer objects</a> or optionally as <a href="https://parse.com/docs/relations_guide">Parse Relation objects</a>.</li>
 </ul><h5>
 <a name="parseadapter-ember-data-adapter" class="anchor" href="#parseadapter-ember-data-adapter"><span class="octicon octicon-link"></span></a>ParseAdapter: Ember Data Adapter</h5>
 
@@ -93,7 +100,6 @@
 <ul>
 <li>Parse Roles implementation</li>
 <li>Parse ACL implementation</li>
-<li>Parse Relation for many-to-many associations.</li>
 </ul><h2>
 <a name="dev-notes" class="anchor" href="#dev-notes"><span class="octicon octicon-link"></span></a>Dev Notes</h2>
 
@@ -102,11 +108,10 @@
 </ul>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/clintjhill">clintjhill</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
   </body>
 </html>
