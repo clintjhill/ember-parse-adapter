@@ -11,6 +11,7 @@ module.exports = function(grunt){
     concat: {
       dist: {
         src: [
+          'lib/ember-parse-many-array.js',
           'lib/ember-parse-adapter.js',
           'lib/ember-parse-serializer.js',
           'lib/ember-parse-model.js',
