@@ -1,7 +1,7 @@
 {
   "name": "ember-data-parse-adapter",
   "description": "Ember Data Adapter for Parse",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "author": "Clint Hill",
   "devDependencies": {
     "grunt": "~0.4.1",
