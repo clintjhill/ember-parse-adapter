@@ -17,14 +17,14 @@ module.exports = function(grunt){
           'lib/ember-parse-model.js',
           'lib/ember-parse-user.js'
         ],
-        dest: 'dist/ember-parse-adapter-<%= pkg.version %>.js'
+        dest: 'dist/ember-parse-adapter.js'
       }
     },
 
     uglify: {
       dist: {
-        src: 'dist/ember-parse-adapter-<%= pkg.version %>.js',
-        dest: 'dist/ember-parse-adapter-<%= pkg.version %>.min.js'
+        src: 'dist/ember-parse-adapter.js',
+        dest: 'dist/ember-parse-adapter.min.js'
       }
     },
 
