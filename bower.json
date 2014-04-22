@@ -13,6 +13,6 @@
     "tests"
   ],
   "dependencies": {
-    "ember-data": ">= 1.0.0"
+    "ember-data": "~1.0.0"
   }
 }
