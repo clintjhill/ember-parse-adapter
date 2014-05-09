@@ -1,0 +1,18 @@
+{
+  "name": "ember-parse-adapter",
+  "version": "0.5.2",
+  "homepage": "https://github.com/clintjhill/ember-parse-adapter",
+  "description": "Ember Data Adapter for Parse",
+  "main": "dist/ember-parse-adapter.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ember-data": "~1.0.0"
+  }
+}
