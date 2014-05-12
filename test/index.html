@@ -10,143 +10,44 @@
 
   <script src="lib/qunit-1.11.0.js"></script>
 
-  <script src="../vendor/jquery-1.10.2.min.js"></script>
-  <script src="../vendor/handlebars-1.0.0.js"></script>
-  <script src="http://builds.emberjs.com/canary/ember.js"></script>
-  <script src="http://builds.emberjs.com/canary/ember-data.js"></script>
+  <script src="../vendor/jquery/dist/jquery.js"></script>
+  <script src="../vendor/handlebars/handlebars.js"></script>
+  <script>
+    window.ENV = { TESTING: true };
+    var extendPrototypes = QUnit.urlParams.extendprototypes;
+    ENV['EXTEND_PROTOTYPES'] = !!extendPrototypes;
+  </script>
+  <script src="../vendor/ember/ember.js"></script>
+  <script src="../vendor/ember-data-debug/index.js"></script>
 
   <script>
-  Ember.config = {};
-  Ember.testing = true;
-
-  window.ENV = { TESTING: true };
-
-  var extendPrototypes = QUnit.urlParams.extendprototypes;
-  ENV['EXTEND_PROTOTYPES'] = !!extendPrototypes;
-
-  window.async = function(callback, timeout) {
-    stop();
-
-    timeout = setTimeout(function() {
-      start();
-      ok(false, "Timeout was reached");
-    }, timeout || 100);
-
-    return function() {
-      clearTimeout(timeout);
-
-      start();
-
-      var args = arguments;
-      Ember.run(function() {
-        callback.apply(this, args);
-      });
-    };
-  };
-
-  window.invokeAsync = function(callback, timeout) {
-    timeout = timeout || 1;
-
-    setTimeout(async(callback, timeout+100), timeout);
-  };
-
-  var syncForTest = function(fn) {
-    var callSuper;
-
-    if (typeof fn !== "function") { callSuper = true; }
-
-    return function() {
-      var override = false, ret;
-
-      if (Ember.run && !Ember.run.currentRunLoop) {
-        Ember.run.begin();
-        override = true;
-      }
-
-      try {
-        if (callSuper) {
-          ret = this._super.apply(this, arguments);
-        } else {
-          ret = fn.apply(this, arguments);
-        }
-      } finally {
-        if (override) {
-          Ember.run.end();
-        }
-      }
-
-      return ret;
-    };
-  };
-
-  Ember.config.overrideAccessors = function() {
-    Ember.set = syncForTest(Ember.set);
-    Ember.get = syncForTest(Ember.get);
-  };
-
-  Ember.config.overrideClassMixin = function(ClassMixin) {
-    ClassMixin.reopen({
-      create: syncForTest()
-    });
-  };
-
-  Ember.config.overridePrototypeMixin = function(PrototypeMixin) {
-    PrototypeMixin.reopen({
-      destroy: syncForTest()
-    });
-  };
-  Ember.View.reopen({
-    _insertElementLater: syncForTest()
-  });
-
-  DS.Store.reopen({
-    save: syncForTest(),
-    createRecord: syncForTest(),
-    deleteRecord: syncForTest(),
-    load: syncForTest(),
-    newLoad: syncForTest(),
-    loadMany: syncForTest(),
-    filter: syncForTest(),
-    find: syncForTest(),
-    findMany: syncForTest(),
-    didSaveRecord: syncForTest(),
-    didSaveRecords: syncForTest(),
-    didUpdateAttribute: syncForTest(),
-    didUpdateAttributes: syncForTest(),
-    didUpdateRelationship: syncForTest(),
-    didUpdateRelationships: syncForTest()
-  });
-
-  DS.Model.reopen({
-    then: syncForTest(),
-    save: syncForTest(),
-    deleteRecord: syncForTest(),
-    dataDidChange: Ember.observer(syncForTest(), 'data'),
-    updateRecordArraysLater: syncForTest()
-  });
-
-  Ember.RSVP.Promise.prototype.then = syncForTest(Ember.RSVP.Promise.prototype.then);
-
-  DS.RecordArray.reopen({
-    then: syncForTest()
-  });
-
-  DS.Transaction.reopen({
-    commit: syncForTest()
-  });  
+    Ember.testing = true;
   </script>
 
-  <script src="../lib/ember-parse-serializer.js"></script>
   <script src="../lib/ember-parse-adapter.js"></script>
-  <script src="../lib/ember-parse-model.js"></script>
-  <script src="../lib/ember-parse-user.js"></script>
+  <script src="../lib/ember-parse-adapter/serializer.js"></script>
+  <script src="../lib/ember-parse-adapter/adapter.js"></script>
+  <script src="../lib/ember-parse-adapter/parse-user.js"></script>
+  <script src="../lib/ember-parse-adapter/geo-point.js"></script>
+  <script src="../lib/ember-parse-adapter/file.js"></script>
+  <script src="../lib/ember-parse-adapter/transforms/geo-point.js"></script>
+  <script src="../lib/ember-parse-adapter/transforms/file.js"></script>
+  <script src="../lib/ember-parse-adapter/transforms/date.js"></script>
+  <script src="../lib/setup-container.js"></script>
+  <script src="../lib/ember.js"></script>
 
-  <script src="expects.js"></script>
+  <script src="support/expects.js"></script>
+  <script src="support/pending.js"></script>
+  <script src="support/async.js"></script>
+  <script src="support/build-container.js"></script>
 
-  <script src="ember-parse-serializer-test.js"></script>
-  <script src="ember-parse-adapter-test.js"></script>
-  <script src="ember-parse-relationship-test.js"></script>
-  <script src="ember-parse-user-test.js"></script>
+  <script src="ember-parse-adapter/adapter-test.js"></script>
+  <script src="ember-parse-adapter/serializer-test.js"></script>
+  <script src="ember-parse-adapter/relationship-test.js"></script>
+  <script src="ember-parse-adapter/parse-user-test.js"></script>
+  <script src="ember-parse-adapter/transforms/geo-point-test.js"></script>
+  <script src="ember-parse-adapter/transforms/file-test.js"></script>
+  <script src="ember-parse-adapter/transforms/date-test.js"></script>
 
 </body>
 </html>

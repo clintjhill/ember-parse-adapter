@@ -11,11 +11,17 @@ module.exports = function(grunt){
     concat: {
       dist: {
         src: [
-          'lib/ember-parse-many-array.js',
           'lib/ember-parse-adapter.js',
-          'lib/ember-parse-serializer.js',
-          'lib/ember-parse-model.js',
-          'lib/ember-parse-user.js'
+          'lib/ember-parse-adapter/serializer.js',
+          'lib/ember-parse-adapter/adapter.js',
+          'lib/ember-parse-adapter/parse-user.js',
+          'lib/ember-parse-adapter/geo-point.js',
+          'lib/ember-parse-adapter/file.js',
+          'lib/ember-parse-adapter/transforms/geo-point.js',
+          'lib/ember-parse-adapter/transforms/file.js',
+          'lib/ember-parse-adapter/transforms/date.js',
+          'lib/setup-container.js',
+          'lib/ember.js'
         ],
         dest: 'dist/ember-parse-adapter.js'
       }
@@ -30,7 +36,7 @@ module.exports = function(grunt){
 
     qunit: {
       options: {
-        timeout: 1000
+        timeout: 10000
       },
       all: {
         options: {

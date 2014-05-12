@@ -1,33 +1,42 @@
 Ember Data Adapter for Parse
 ===================
 
-An [Ember Data Adapter](https://github.com/emberjs/data) built to use the [Parse REST API](https://parse.com/docs/rest). This is a full Ember implementation against the Parse REST API without the use of the Parse JavaScript SDK. 
+An [Ember Data](https://github.com/emberjs/data) plugin built to use
+the [Parse REST API](https://parse.com/docs/rest). This is a full Ember
+implementation against the Parse REST API without the use of the Parse
+JavaScript SDK.
 
-Examples
---------
-There is an example of all of the features inside the [example.html](example.html) file.
+The [example.html](example.html) file contains some example usage.
 
 Features
 --------
 
-##### ParseJSONSerializer: Ember Data JSONSerializer
+##### EmberParseAdapter.Serializer
+
   * Provides the translation of objectId to id for identity mapping.
-  * Provides encoding of hasMany associations to arrays of [Parse Pointer objects](https://parse.com/docs/rest#objects-types) or optionally as [Parse Relation objects](https://parse.com/docs/relations_guide).
+  * Provides encoding of hasMany associations to arrays of [Parse Pointer objects](https://parse.com/docs/rest#objects-types).
 
-##### ParseAdapter: Ember Data Adapter
+##### EmberParseAdapter.Adapter
+
   * Implements the persistence layer to Parse by extending the Ember Data REST Adapter.
+  * Provides a `sessionToken` property which can set a session token.
 
-##### ParseModel: Ember Data Model
-  * Provides an easy way to setup a Parse object.
+##### EmberParseAdapter.ParseUser
 
-##### ParseUser: Parse User implementation.
   * Login
   * Signup
   * Request password reset
+  * Is stored at the special user endpoint at parse
+
+##### EmberParseAdapter.Transforms
+
+  * Provides transforms for file, geo, and date types at Parse.
 
 Get Started
 -----------
-You'll want to get an account at [Parse](https://parse.com). After this you will be provided with three keys:
+
+You'll want to get an account at [Parse](https://parse.com). After this you will
+be provided with three keys:
 
 * Application ID
 * JavaScript Key
@@ -36,30 +45,55 @@ You'll want to get an account at [Parse](https://parse.com). After this you will
 You will need each of these to configure the ParseAdapter.
 
 ```javascript
-  var App = Ember.Application.create();
+var App = Ember.Application.create();
 
-  App.ApplicationAdapter = DS.ParseAdapter.extend({
-    applicationId: '<YOUR APP ID HERE>',
-    restApiId: '<YOUR REST API KEY HERE>',
-    javascriptId: '<YOUR JAVASCRIPT KEY HERE>'
-  });
+App.ApplicationAdapter = DS.ParseAdapter.extend({
+  applicationId: '<YOUR APP ID HERE>',
+  restApiId: '<YOUR REST API KEY HERE>',
+  javascriptId: '<YOUR JAVASCRIPT KEY HERE>'
+});
 ```
 
-Once you have your adapter configured now you can create ParseModels just as you would create DS.Models.
+Any model using this adapter will be stored on Parse. Create models
+as you would normally:
 
 ```javascript
-  App.Post = DS.ParseModel.extend({
-    title: DS.attr('string'),
-    body: DS.attr('string')
-  });
+App.Post = DS.Model.extend({
+  // Attributes can use normal transforms
+  title: DS.attr('string'),
+  body: DS.attr('string'),
+  // Or there are special transforms for some data-types
+  avatar: DS.attr('parse-file'),
+  // There is a parse-date transform, but sometimes dates are just strings
+  updatedAt: DS.attr('date'),
+  // ALWAYS refer to relationships as async, for now.
+  user: DS.belongsTo('user', {async: true})
+});
 ```
 
 Roadmap
 -------
 
-* Parse Roles implementation
-* Parse ACL implementation
+* Move to ES6 modules.
+* Bring back relationships via Parse relation type?
+* Bytes type?
+* Parse Roles implementation.
+* Parse ACL implementation.
 
 Dev Notes
 ---------
-* To get a build simply grunt. You'll find builds inside the /dist folder.
+
+To get started with the codebase, be sure to run the standard dependency installs:
+
+```
+npm install
+bower install
+```
+
+Now you have several grunt tasks available:
+
+```
+grunt # -> builds the files into dist/
+grunt test # -> Runs the tests in the console
+grunt connect:server:keepalive # -> Runs the test server, visit http://localhost:8000/test/
+```
