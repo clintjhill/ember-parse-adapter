@@ -382,24 +382,21 @@ EmberParseAdapter.ParseUser = DS.Model.extend({
   sessionToken: DS.attr('string'),
 
   createdAt: DS.attr('date'),
-  updatedAt: DS.attr('date'),
-
-  logout: function(){
-    var adapter = this.get('store').adapterFor(this.constructor);
-  },
-
-  requestPasswordReset: function(afterReset){
-    var adapter = this.get('store').adapterFor(this.constructor);
-    var user = { email: this.get('email') };
-    adapter.ajax(adapter.buildURL("requestPasswordReset"), "POST", {data:user}).then(
-      function(data){ afterReset(data); },
-      function(data){ afterReset(data.responseJSON); }
-    );
-  }
+  updatedAt: DS.attr('date')
 
 });
 
 EmberParseAdapter.ParseUser.reopenClass({
+
+  requestPasswordReset: function(email){
+    var adapter = this.get('store').adapterFor(this);
+    var data = { email: email };
+    return adapter.ajax(adapter.buildURL("requestPasswordReset"), "POST", {data:data})['catch'](
+      function(response){
+        return Ember.RSVP.reject(response.responseJSON);
+      }
+    );
+  },
 
   login: function(store, data){
     if(Ember.isEmpty(this.typeKey)){
@@ -464,6 +461,34 @@ EmberParseAdapter.File = Ember.Object.extend({
 
 });
 
+/*
+ * The file transform handles Parse's custom GeoPoint format. For
+ * example a Parse file might come back from the REST API
+ * looking like this:
+ *
+ * "registeredAt": {
+ *   "__type": "GeoPoint",
+ *   "latitude": 45.2934237432,
+ *   "longitude": -17.233242432
+ * }
+ *
+ * This helper deserializes that structure into a special
+ * EmberParseAdapter.GeoPoint object. This object should not be
+ * changed, instead set a new file object to the property.
+ *
+ * this.store.find('model').then(function(model){
+ *   model.get('someGeo'); // -> GeoPoint object
+ *   model.get('someGeo.latitude'); // -> someGeo latitude
+ *
+ *   var geoPoint = new EmberParseAdapter.GeoPoint(lat, lon);
+ *   model.set('someGeo', geoPoint);
+ * });
+ *
+ * When saving a record, the EmberParseAdapter.GeoPoint object
+ * is likewise serialized into the Parse REST API format.
+ *
+ * @class EmberParseAdapter.Transforms.GeoPoint
+ */
 EmberParseAdapter.Transforms.GeoPoint = DS.Transform.extend({
 
   deserialize: function(serialized) {
@@ -486,6 +511,34 @@ EmberParseAdapter.Transforms.GeoPoint = DS.Transform.extend({
 
 });
 
+/*
+ * The file transform handles Parse's custom data format. For
+ * example a Parse file might come back from the REST API
+ * looking like this:
+ *
+ * "registeredAt": {
+ *   "__type": "File",
+ *   "name": "foo.jpg",
+ *   "url": "http://some.s3.url.com/foo.jpg"
+ * }
+ *
+ * This helper deserializes that structure into a special
+ * EmberParseAdapter.File object. This object should not be
+ * changed, instead set a new file object to the property.
+ *
+ * this.store.find('model').then(function(model){
+ *   model.get('someFile'); // -> File object
+ *   model.get('someFile.url'); // -> someFile URL
+ *
+ *   var file = new EmberParseAdapter.File('foo.jpg', url);
+ *   model.set('someFile', file);
+ * });
+ *
+ * When saving a record, the EmberParseAdapter.File object
+ * is likewise serialized into the Parse REST API format.
+ *
+ * @class EmberParseAdapter.Transforms.File
+ */
 EmberParseAdapter.Transforms.File = DS.Transform.extend({
 
   deserialize: function(serialized) {
@@ -508,6 +561,22 @@ EmberParseAdapter.Transforms.File = DS.Transform.extend({
 
 });
 
+/*
+ * The date transform handles Parse's custom data format. For
+ * example a Parse date might come back from the REST API
+ * looking like this:
+ *
+ * "registeredAt": {
+ *   "__type": "Date",
+ *   "iso": "2014-06-05T12:43:50.716Z"
+ * }
+ *
+ * This helper deserializes that structure into a normal
+ * JavaScript date object. In also performs the inverse:
+ * converting a date object back into Parse's custom format.
+ *
+ * @class EmberParseAdapter.Transforms.Data
+ */
 EmberParseAdapter.Transforms.Date = DS.Transform.extend({
 
   deserialize: function(serialized) {
