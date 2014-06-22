@@ -13,9 +13,6 @@
     "tests"
   ],
   "dependencies": {
-    "ember-data": "~1.0.0"
-  },
-  "devDependencies": {
-    "ember-data-debug": "http://builds.emberjs.com/canary/shas/586506945f1d6d41b956c85c40e294536d7d1e09/ember-data.js"
+    "ember-data": "~1.0.0-beta.8"
   }
 }
