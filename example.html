@@ -3,7 +3,7 @@
 <head>
   <title>Ember Data Adapter for Parse -- Example</title>
   <link rel="stylesheet" href="vendor/foundation.min.css"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
 
@@ -20,6 +20,7 @@
           <li>{{#link-to 'simple'}}Simple Model{{/link-to}}</li>
           <li>{{#link-to 'belongsto'}}Belongs To Model{{/link-to}}</li>
           <li>{{#link-to 'hasmany'}}Has Many Model{{/link-to}}</li>
+          <li>{{#link-to 'facebook_login'}}Facebook Login{{/link-to}}</li>
           <li>{{#link-to 'login'}}Login{{/link-to}}</li>
           <li>{{#link-to 'signup'}}Sign Up{{/link-to}}</li>
         </ul>
@@ -61,6 +62,11 @@
             Successfully saved Simple Model.
             <a {{action 'reset'}} class="close">&times;</a>
           </div>
+        {{/if}}
+        {{#if lastSavedModel}}
+          <div>id: {{lastSavedModel.id}}</div>
+          <div>Name: {{lastSavedModel.name}}</div>
+          <div>Created At: {{lastSavedModel.createdAt}}</div>
         {{/if}}
       </div>
     </div>
@@ -166,6 +172,48 @@
       </div>
     </div>
   </script>
+  <script type="text/x-handlebars" data-template-name="facebook_login">
+    <div class="row">
+      <div class="small-12 columns">
+        <h2>Login</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <p>Below is a working sample for a Facebook Login.</p>
+        <p>
+          Fetch a valid access_token and id at the <a href="https://developers.facebook.com/tools/explorer/145634995501895/?method=GET&path=me%3Ffields%3Did%2Cname&version=v2.0">Facebook Graph console</a>.
+        </p>
+        {{#if loggedIn}}
+          <div data-alert class="alert-box success radius">
+            <p>Successfully Logged in.</p>
+            <p>{{username}} {{loginMessage}}</p>
+            <a href="#" class="close">&times;</a>
+          </div>
+        {{else}}
+          <form>
+            <div>
+              <label for="accessToken">Access Token</label>
+              {{input value=accessToken id="accessToken" placeholder="a29gg2"}}
+            </div>
+            <div>
+              <label for="facebookUid">Facebook Uid</label>
+              {{input value=facebookUid id="facebookUid"}}
+            </div>
+            <div>
+              <button {{action 'login'}}>Save</button>
+            </div>
+            {{#if loginMessage}}
+              <div data-alert class="alert-box warning radius">
+                <p>{{loginMessage}}</p>
+                <a href="#" class="close">&times;</a>
+              </div>
+            {{/if}}
+          </form>
+        {{/if}}
+      </div>
+    </div>
+  </script>
   <script type="text/x-handlebars" data-template-name="login">
     <div class="row">
       <div class="small-12 columns">
@@ -182,43 +230,43 @@
             <a href="#" class="close">&times;</a>
           </div>
         {{else}}
-        <form>
-          <div>
-            <label for="username">Name</label>
-            {{input value=username id="username" placeholder="happydev"}}
-          </div>
-          <div>
-            <label for="password">Password</label>
-            {{input value=password id="password"}}
-          </div>
-          <div>
-            <button {{action 'login'}}>Save</button>
-          </div>
-        {{#if loginMessage}}
-          <div data-alert class="alert-box warning radius">
-            <p>{{loginMessage}}</p>
-            <a href="#" class="close">&times;</a>
-          </div>
-        {{/if}}
-        </form>
+          <form>
+            <div>
+              <label for="username">Name</label>
+              {{input value=username id="username" placeholder="happydev"}}
+            </div>
+            <div>
+              <label for="password">Password</label>
+              {{input value=password id="password"}}
+            </div>
+            <div>
+              <button {{action 'login'}}>Save</button>
+            </div>
+            {{#if loginMessage}}
+              <div data-alert class="alert-box warning radius">
+                <p>{{loginMessage}}</p>
+                <a href="#" class="close">&times;</a>
+              </div>
+            {{/if}}
+          </form>
         {{/if}}
       </div>
     </div>
   </script>
 <!-- dependencies -->
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="vendor/handlebars-v1.3.0.js"></script>
-<script src="http://builds.emberjs.com/canary/ember.js"></script>
-<script src="http://builds.emberjs.com/canary/ember-data.js"></script>
+<script src="vendor/jquery/dist/jquery.js"></script>
+<script src="vendor/handlebars/handlebars.js"></script>
+<script src="vendor/ember/ember.js"></script>
+<script src="vendor/ember-data-debug/index.js"></script>
 <!-- Parse Data Adapter (latest build) -->
-<script src="dist/ember-parse-adapter-0.4.17.js"></script>
+<script src="dist/ember-parse-adapter.js"></script>
 <script src="vendor/foundation.min.js"></script>
 <script>
 
   // Create an Ember application
   var App = Ember.Application.create();
   // Create the ApplicationAdapter with Parse
-  App.ApplicationAdapter = DS.ParseAdapter.extend({
+  App.ApplicationAdapter = EmberParseAdapter.Adapter.extend({
     applicationId: 'Hf7dgrv4WPBcJYUsLgDMZCwKxf3hdbAc1nnSsVza',
     restApiId: 'BH0IoMxroXSVU3GTMQTVaM4BXjvdX7lKtFujgvzO',
     javascriptId: 'QGgSQetb7sLuKAuYsgLkCpHqt0TjqJNLcTSv7xHL'
@@ -229,11 +277,12 @@
     this.route('belongsto');
     this.route('hasmany');
     this.route('login');
+    this.route('facebook_login');
     this.route('signup');
   });
 
-  
-  // === Simple Model 
+
+  // === Simple Model
   App.SimpleRoute = Ember.Route.extend({
     model: function(){
       return this.get('store').createRecord('simple');
@@ -241,6 +290,7 @@
   });
 
   App.SimpleController = Ember.Controller.extend({
+    lastSavedModel: null,
     succeeded: false,
     name: null,
     actions: {
@@ -254,6 +304,7 @@
         this.get('model').save().then(
           function(simple){
             controller.set('succeeded', true);
+            controller.set('lastSavedModel', simple);
           },
           function(error){
             controller.set('succeeded', false);
@@ -263,8 +314,9 @@
     }
   });
 
-  App.Simple = DS.ParseModel.extend({
-    name: DS.attr('string')
+  App.Simple = DS.Model.extend({
+    name: DS.attr('string'),
+    createdAt: DS.attr('date')
   });
   // === End of Simple Model
 
@@ -293,11 +345,11 @@
       }
     }
   });
-  App.Donut = DS.ParseModel.extend({
+  App.Donut = DS.Model.extend({
     flavor: DS.attr('string'),
     hole: DS.belongsTo('hole')
   });
-  App.Hole = DS.ParseModel.extend({
+  App.Hole = DS.Model.extend({
     donut: DS.belongsTo('donut')
   });
   // === End of Belongs To Model
@@ -319,7 +371,7 @@
         var tiger = this.get('model');
         tiger.set('name', name);
         tiger.save().then(function(tiger){
-          controller.set('saved', true); 
+          controller.set('saved', true);
         });
       },
       add: function(){
@@ -331,22 +383,16 @@
       }
     }
   });
-  App.Tiger = DS.ParseModel.extend({
+  App.Tiger = DS.Model.extend({
     name: DS.attr('string'),
     stripes: DS.hasMany('stripe')
   });
-  App.Stripe = DS.ParseModel.extend({
+  App.Stripe = DS.Model.extend({
     tiger: DS.belongsTo('tiger')
   });
   // === End Has Many Model
 
-  // === User for both Login and Signup
-  App.User = DS.ParseUserModel.extend({
-
-  });
-  // === End User
-
-  // === Login 
+  // === Login
   App.LoginController = Ember.Controller.extend({
     username: null,
     password: null,
@@ -354,15 +400,20 @@
     loginMessage: null,
     actions: {
       login: function(){
-        var controller = this;
-        DS.ParseUserModel.login(this.get('username'), this.get('password')).then(
+        var controller = this,
+            ParseUser = this.store.modelFor('parse-user'),
+            data = {
+              username: this.get('username'),
+              password: this.get('password')
+            };
+        ParseUser.login(this.store, data).then(
           function(user){
             controller.set('loggedIn', true);
             controller.set('loginMessage', "Welcome!");
           },
           function(error){
             controller.set('loggedIn', false);
-            controller.set('loginMessage', error.error);
+            controller.set('loginMessage', error.message || error.error);
           }
         );
       }
@@ -370,8 +421,42 @@
   });
   // === End Login
 
+  // === Login Facebook
+  App.FacebookLoginController = Ember.Controller.extend({
+    accessToken: null,
+    facebookUid: null,
+    loggedIn: false,
+    loginMessage: null,
+    actions: {
+      login: function(){
+        var controller = this,
+            ParseUser = this.store.modelFor('parse-user'),
+            data = {
+              // username: 'Some facebook user',
+              authData: {
+                facebook: {
+                  access_token: this.get('accessToken'),
+                  id: this.get('facebookUid'),
+                  expiration_date: (new Date(2032,2,2))
+                }
+              }
+            };
+        ParseUser.signup(this.store, data).then(
+          function(user){
+            controller.set('loggedIn', true);
+            controller.set('loginMessage', "Welcome!");
+          },
+          function(error){
+            controller.set('loggedIn', false);
+            controller.set('loginMessage', error.message || error.error);
+          }
+        );
+      }
+    }
+  });
+  // === End Login
 
-  // === Sign up 
+  // === Sign up
   App.SignupController = Ember.Controller.extend({
     username: null,
     password: null,
@@ -380,21 +465,27 @@
     loginMessage: null,
     actions: {
       signup: function(){
-        var controller = this;
-        App.User.signup(this.get('username'), this.get('password'), this.get('email')).then(
+        var controller = this,
+            ParseUser = this.store.modelFor('parse-user'),
+            data = {
+              username: this.get('username'),
+              password: this.get('password'),
+              email: this.get('email')
+            };
+        ParseUser.signup(this.store, data).then(
           function(user){
             controller.set('loggedIn', true);
             controller.set('loginMessage', "Welcome!");
           },
           function(error){
             controller.set('loggedIn', false);
-            controller.set('loginMessage', error.error);
+            controller.set('loginMessage', error.message || error.error);
           }
         );
       }
     }
   });
-  // === End Sign up 
+  // === End Sign up
 </script>
 
 <script>
