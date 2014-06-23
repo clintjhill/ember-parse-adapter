@@ -150,12 +150,31 @@ pending("findMany via a hasMany relationship", function(){
   });
 });
 
-test("Find Query", function(){
-  posts = store.find('post', {where: JSON.stringify({title: 'First Post'})});
+test("Find Query without where", function(){
+  posts = store.find('post', {title: 'First Post'});
   equal(get(posts, 'length'), 0, "there are no posts yet as the query has not returned.");
   expect(ajaxUrl, "/1/classes/Post", "requests the post class");
   equal(ajaxType, "GET");
-  deepEqual(ajaxHash.data, {where: JSON.stringify({title: 'First Post'})}, "where clause is passed as data");
+  deepEqual(ajaxHash.data, {where: JSON.stringify({title: 'First Post'}) }, "where clause is passed as stringified data");
+  ajaxHash.success({
+    results: [
+      { objectId: 'bad1', title: 'First Post'},
+      { objectId: 'bad2', title: 'First Post'}
+    ]
+  });
+
+  equal(get(posts, 'length'), 2, "there are 2 posts loaded");
+  posts.forEach(function(post){
+    equal(get(post, 'isLoaded'), true, "the post is being loaded");
+  });
+});
+
+test("Find Query with where", function(){
+  posts = store.find('post', {where: {title: 'First Post'}});
+  equal(get(posts, 'length'), 0, "there are no posts yet as the query has not returned.");
+  expect(ajaxUrl, "/1/classes/Post", "requests the post class");
+  equal(ajaxType, "GET");
+  deepEqual(ajaxHash.data, {where: JSON.stringify({title: 'First Post'}) }, "where clause is passed as stringified data");
   ajaxHash.success({
     results: [
       { objectId: 'bad1', title: 'First Post'},
