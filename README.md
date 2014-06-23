@@ -47,7 +47,7 @@ You will need each of these to configure the ParseAdapter.
 ```javascript
 var App = Ember.Application.create();
 
-App.ApplicationAdapter = DS.ParseAdapter.extend({
+App.ApplicationAdapter = EmberParseAdapter.Adapter.extend({
   applicationId: '<YOUR APP ID HERE>',
   restApiId: '<YOUR REST API KEY HERE>',
   javascriptId: '<YOUR JAVASCRIPT KEY HERE>'
