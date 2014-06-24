@@ -11,8 +11,9 @@ module("Unit - Date transform", {
 
 test("should serialize", function(){
   var date = new Date(2013,10,10);
+  var origIso = date.toISOString();
   var data = transform.serialize(date);
-  equal(data.iso, "2013-11-10T05:00:00.000Z", "iso is rendered");
+  equal(data.iso, origIso, "iso is rendered");
   equal(data.__type, "Date", "has the proper type");
 });
 
@@ -23,7 +24,7 @@ test("should deserialize", function(){
   };
   var date = transform.deserialize(data);
   ok(date instanceof Date, "is a date");
-  equal(date.toString(), "Sun Nov 10 2013 00:00:00 GMT-0500 (EST)", "url is preserved");
+  equal(date.getTime(), 1384059600000, "timestamp is correct");
 });
 
 test("should deserialize null to null", function(){
