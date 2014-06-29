@@ -181,6 +181,20 @@ test("Find Query with where", function(){
       { objectId: 'bad2', title: 'First Post'}
     ]
   });
+});
+
+test("Find Query with where as string", function(){
+  posts = store.find('post', {where: "{title: 'First Post'}"});
+  equal(get(posts, 'length'), 0, "there are no posts yet as the query has not returned.");
+  expect(ajaxUrl, "/1/classes/Post", "requests the post class");
+  equal(ajaxType, "GET");
+  deepEqual(ajaxHash.data, {where: "{title: 'First Post'}"}, "where clause is passed through as string");
+  ajaxHash.success({
+    results: [
+      { objectId: 'bad1', title: 'First Post'},
+      { objectId: 'bad2', title: 'First Post'}
+    ]
+  });
 
   equal(get(posts, 'length'), 2, "there are 2 posts loaded");
   posts.forEach(function(post){
@@ -194,7 +208,7 @@ test("Create Record", function(){
   Ember.run(function(){
     post = store.createRecord('post', {title: 'Testing Create'});
     ok(get(post, 'isNew'), "record is new");
-    promise = post.save()
+    promise = post.save();
   });
   ok(get(post, 'isSaving'), "record is saving");
   equal(ajaxUrl, "https://api.parse.com/1/classes/Post", "requests the post class");
