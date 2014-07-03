@@ -2,7 +2,7 @@
   "name": "ember-data-parse-adapter",
   "description": "Ember Data Adapter for Parse",
   "version": "0.5.2",
-  "author": "Clint Hill",
+  "main": "dist/ember-parse-adapter.js",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.1.0",
@@ -10,5 +10,43 @@
     "grunt-contrib-uglify": "~0.1.1",
     "grunt-contrib-connect": "~0.1.0",
     "grunt-contrib-concat": "~0.1.2"
+  },
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [
+    "parse",
+    "ember.js",
+    "ember-data"
+  ],
+  "files": [
+    "dist/"
+  ],
+  "author": {
+    name: "Clint Hill"
+  },
+  "contributors": {
+    {
+      "name": "Matt Beale",
+      "email": "matt.beale@madhatted.com"
+    }
+  },
+  "maintainers": {
+    {
+      "name": "Matt Beale",
+      "email": "matt.beale@madhatted.com"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "test": "grunt test",
+    "prepublish": "grunt"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/clintjhill/ember-parse-adapter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clintjhill/ember-parse-adapter/issues"
   }
 }
