@@ -23,20 +23,20 @@
     "dist/"
   ],
   "author": {
-    name: "Clint Hill"
+    "name": "Clint Hill"
   },
-  "contributors": {
+  "contributors": [
     {
       "name": "Matt Beale",
       "email": "matt.beale@madhatted.com"
     }
-  },
-  "maintainers": {
+  ],
+  "maintainers": [
     {
       "name": "Matt Beale",
       "email": "matt.beale@madhatted.com"
     }
-  },
+  ],
   "license": "MIT",
   "scripts": {
     "test": "grunt test",
