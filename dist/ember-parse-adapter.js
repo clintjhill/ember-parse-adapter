@@ -362,33 +362,27 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
   },
 
   /**
-   * Implementation of findQuery that automatically places the query in a where clause for brevity
+   * Implementation of findQuery that automatically wraps query in a
+   * JSON string.
    *
    * @example
    *     this.store.find('comment', {
+   *       where: {
    *         post: {
    *             "__type":  "Pointer",
    *             "className": "Post",
    *             "objectId": post.get('id')
    *         }
+   *       }
    *     });
    */
   findQuery: function (store, type, query) {
-    var whereQuery = query;
-
-    if (!whereQuery.where) {
-      // Wrap in a where clause
-      whereQuery = {
-        where: whereQuery
-      };
-    }
-
-    if (Ember.typeOf(whereQuery.where) !== 'string') {
-      whereQuery.where = JSON.stringify(whereQuery.where);
+    if (query.where && Ember.typeOf(query.where) !== 'string') {
+      query.where = JSON.stringify(query.where);
     }
 
     // Pass to _super()
-    return this._super(store, type, whereQuery);
+    return this._super(store, type, query);
   },
 
   sessionToken: Ember.computed('headers.X-Parse-Session-Token', function(key, value){
