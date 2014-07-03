@@ -6,7 +6,7 @@ the [Parse REST API](https://parse.com/docs/rest). This is a full Ember
 implementation against the Parse REST API without the use of the Parse
 JavaScript SDK.
 
-The [example.html](example.html) file contains some example usage.
+The [example](example/index.html) file contains some example usage.
 
 Features
 --------
@@ -31,6 +31,27 @@ Features
 ##### EmberParseAdapter.Transforms
 
   * Provides transforms for file, geo, and date types at Parse.
+
+Installation
+------------
+## Script tags
+
+```html
+<!-- Don't forget to include Ember, Ember Data, and their dependencies -->
+<script src="ember-parse-adapter.js"></script>
+```
+
+## Bower
+
+```sh
+bower install ember-parse-adapter
+```
+
+## [Ember CLI](https://github.com/stefanpenner/ember-cli) Addon.
+
+```sh
+npm install --save-dev ember-parse-adapter
+```
 
 Get Started
 -----------
