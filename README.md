@@ -6,7 +6,7 @@ the [Parse REST API](https://parse.com/docs/rest). This is a full Ember
 implementation against the Parse REST API without the use of the Parse
 JavaScript SDK.
 
-The [example.html](example.html) file contains some example usage.
+The [example](example/index.html) file contains some example usage.
 
 Features
 --------
