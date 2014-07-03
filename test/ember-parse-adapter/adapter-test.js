@@ -97,6 +97,14 @@ test("find with sessionToken", function(){
   ok(isLoaded, "the record is now in the store, and can be looked up by ID without another AJAX request");
 });
 
+test("can get a set sessionToken", function(){
+  token = Ember.run(function(){
+    adapter.set('sessionToken', 'some-odd-token');
+    return adapter.get('sessionToken');
+  });
+  equal(token, 'some-odd-token');
+});
+
 test("findAll", function(){
   posts = store.find('post');
   expect(ajaxUrl, "/1/classes/Post", "The Parse API version and classes with Post.");
