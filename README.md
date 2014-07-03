@@ -32,6 +32,29 @@ Features
 
   * Provides transforms for file, geo, and date types at Parse.
 
+Installation
+------------
+## Script tags
+
+```html
+<!-- Don't forget to include Ember, Ember Data, and their dependencies -->
+<script src="ember-parse-adapter.js"></script>
+```
+
+## Bower
+
+```sh
+bower install ember-parse-adapter
+```
+
+## [Ember CLI](https://github.com/stefanpenner/ember-cli) Addon.
+
+```sh
+# Don't forget to include Ember Data
+# e.g. $ npm install --save-dev ember-cli-ember-data
+npm install --save-dev ember-parse-adapter
+```
+
 Get Started
 -----------
 

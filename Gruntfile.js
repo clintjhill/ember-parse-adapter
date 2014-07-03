@@ -50,17 +50,26 @@ module.exports = function(grunt){
         port: 8000,
         base: '.'
       }
+    },
+
+    copy: {
+      npm: {
+        files: [
+          { src: 'dist/*', dest: 'vendor/ember-parse-adapter/' }
+        ]
+      }
     }
 
   });
 
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
-  grunt.registerTask('test', ['connect', 'qunit']);
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify']);
-
+  grunt.registerTask('build', ['concat', 'jshint', 'uglify', 'copy:npm'])
+  grunt.registerTask('test', ['build', 'connect', 'qunit']);
+  grunt.registerTask('default', ['build', 'test']);
 };
