@@ -361,11 +361,42 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
     return this.ajax(this.buildURL(relatedInfo.type.typeKey), "GET", { data: query });
   },
 
+  /**
+   * Implementation of findQuery that automatically places the query in a where clause for brevity
+   *
+   * @example
+   *     this.store.find('comment', {
+   *         post: {
+   *             "__type":  "Pointer",
+   *             "className": "Post",
+   *             "objectId": post.get('id')
+   *         }
+   *     });
+   */
+  findQuery: function (store, type, query) {
+    var whereQuery = query;
+
+    if (!whereQuery.where) {
+      // Wrap in a where clause
+      whereQuery = {
+        where: whereQuery
+      };
+    }
+
+    if (Ember.typeOf(whereQuery.where) !== 'string') {
+      whereQuery.where = JSON.stringify(whereQuery.where);
+    }
+
+    // Pass to _super()
+    return this._super(store, type, whereQuery);
+  },
+
   sessionToken: Ember.computed('headers.X-Parse-Session-Token', function(key, value){
     if (arguments.length < 2) {
       return this.get('headers.X-Parse-Session-Token');
     } else {
-      return this.set('headers.X-Parse-Session-Token', value);
+      this.set('headers.X-Parse-Session-Token', value);
+      return value;
     }
   })
 });
