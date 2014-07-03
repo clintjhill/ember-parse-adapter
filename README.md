@@ -50,8 +50,6 @@ bower install ember-parse-adapter
 ## [Ember CLI](https://github.com/stefanpenner/ember-cli) Addon.
 
 ```sh
-# Don't forget to include Ember Data
-# e.g. $ npm install --save-dev ember-cli-ember-data
 npm install --save-dev ember-parse-adapter
 ```
 
