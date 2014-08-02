@@ -249,6 +249,8 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
       return "users";
     } else if ("login" === type) {
       return "login";
+    } else if ("me" === type) {
+      return "users/me";
     } else {
       return this.classesPath + '/' + this.parsePathForType(type);
     }
@@ -418,6 +420,16 @@ EmberParseAdapter.ParseUser = DS.Model.extend({
 });
 
 EmberParseAdapter.ParseUser.reopenClass({
+
+  me: function(sessionToken) {
+    var adapter = this.store.adapterFor(this);
+    adapter.set('sessionToken', sessionToken);
+    return adapter.ajax(adapter.buildURL("me"), "GET")['catch'](
+      function(response){
+        return Ember.RSVP.reject(response.responseJSON);
+      }
+    );
+  },
 
   requestPasswordReset: function(email){
     var adapter = this.get('store').adapterFor(this);
