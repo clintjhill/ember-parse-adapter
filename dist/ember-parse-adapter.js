@@ -495,7 +495,6 @@ EmberParseAdapter.File = Ember.Object.extend({
 EmberParseAdapter.ACL = Ember.Object.extend({
 });
 
-console.log("included");
 EmberParseAdapter.Transforms.ACL = DS.Transform.extend({
 
   deserialize: function(serialized) {
