@@ -492,6 +492,36 @@ EmberParseAdapter.File = Ember.Object.extend({
 
 });
 
+EmberParseAdapter.ACL = Ember.Object.extend({
+});
+
+console.log("included");
+EmberParseAdapter.Transforms.ACL = DS.Transform.extend({
+
+  deserialize: function(serialized) {
+    if (!serialized) {
+      return null;
+    }
+
+    return new EmberParseAdapter.ACL(serialized);
+  },
+
+  serialize: function(deserialized) {
+    if (!deserialized) {
+      return null;
+    }
+    
+    var hash = {};
+
+    Object.keys(deserialized).forEach(function(key) {
+      hash[key] = deserialized.get(key);
+    });
+
+    return hash;
+  }
+
+});
+
 /*
  * The file transform handles Parse's custom GeoPoint format. For
  * example a Parse file might come back from the REST API
@@ -636,6 +666,7 @@ EmberParseAdapter.setupContainer = function(container){
   container.register('transform:parse-geo-point', EmberParseAdapter.Transforms.GeoPoint);
   container.register('transform:parse-file', EmberParseAdapter.Transforms.File);
   container.register('transform:parse-date', EmberParseAdapter.Transforms.Date);
+  container.register('transform:parse-acl', EmberParseAdapter.Transforms.ACL);
 };
 
 /**

@@ -17,6 +17,8 @@ module.exports = function(grunt){
           'lib/ember-parse-adapter/parse-user.js',
           'lib/ember-parse-adapter/geo-point.js',
           'lib/ember-parse-adapter/file.js',
+          'lib/ember-parse-adapter/acl.js',
+          'lib/ember-parse-adapter/transforms/acl.js',
           'lib/ember-parse-adapter/transforms/geo-point.js',
           'lib/ember-parse-adapter/transforms/file.js',
           'lib/ember-parse-adapter/transforms/date.js',
