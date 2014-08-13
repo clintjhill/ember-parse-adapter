@@ -183,10 +183,12 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         json[key].__op = "AddUnique";
       }
 
+      var _this = this;
+
       hasMany.forEach(function(child){
         json[key].objects.push({
           "__type": "Pointer",
-          "className": child.parseClassName(),
+          "className": _this.parseClassName(child.constructor.typeKey),
           "objectId": child.get('id')
         });
       });
@@ -336,7 +338,11 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
   },
 
   parseClassName: function(key) {
-    return Ember.String.capitalize(key);
+    if (key === "parseUser") {
+      return "_User";
+    } else {
+      return Ember.String.capitalize(Ember.String.camelize(key));
+    }
   },
 
   /**
@@ -349,7 +355,7 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
         "$relatedTo": {
           "object": {
             "__type": "Pointer",
-            "className": this.parseClassName(record.typeKey),
+            "className": this.parseClassName(record.typeKey || record.constructor.typeKey),
             "objectId": record.get('id')
           },
           key: relatedInfo.key
