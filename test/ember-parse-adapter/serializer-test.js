@@ -79,18 +79,48 @@ test("many posts are extracted", function(){
   equal(res[1].title, 'Test B', 'Title should be put on post namespace');
 });
 
-pending("hasMany for serialization (Parse Pointer)", function(){
+test("hasMany addition for serialization (Parse Pointer)", function(){
   var serialized,
       hash = {},
       relationship = { options: { embedded: false }},
       post,
       comment;
-  store.load(Post, "1", {title: 'Testing hasMany serialization.'});
-  store.load(Comment, "1", {content: 'Comment 1'});
-  post = store.find(Post, "1");
-  comment = store.find(Comment, "1");
-  post.get('comments').pushObject(comment);
-  serializer.addHasMany(hash, post, "comments", relationship);
-  equal(hash.comments[0]["__type"], "Pointer", "Should be a Pointer __type/class.");
-  equal(hash.comments[0]["className"], "Comment", "Should be Comment class.");
+  Ember.run(function(){
+    store.push('post', {id: '1', title: 'Testing hasMany serialization.'});
+    store.push('comment', {id: "1", content: 'Comment 1'});
+  });
+  post = store.getById('post', "1");
+  comment = store.getById('comment', "1");
+
+  Ember.run(function(){
+    post.get('comments').pushObject(comment);
+  });
+
+  var hash = store.serializerFor('post').serialize(post);
+  equal(hash.comments.__op, 'AddRelation', 'Should be a an AddRelation op');
+  equal(hash.comments.objects[0].__type, 'Pointer', 'Should be a Pointer __type/class');
+  equal(hash.comments.objects[0].className, 'Comment', 'Should be Comment class');
+});
+
+test("hasMany removal for serialization (Parse Pointer)", function(){
+  var serialized,
+      hash = {},
+      relationship = { options: { embedded: false }},
+      post,
+      comment;
+  Ember.run(function(){
+    store.push('comment', {id: "1", content: 'Comment 1'});
+    store.push('post', {id: '1', title: 'Testing hasMany serialization.', comments: ['1']});
+  });
+  post = store.getById('post', '1');
+  comment = store.getById('comment', '1');
+
+  Ember.run(function(){
+    post.get('comments').removeObject(comment);
+  });
+
+  var hash = store.serializerFor('post').serialize(post);
+  equal(hash.comments.__op, 'RemoveRelation', 'Should be a RemoveRelation op');
+  equal(hash.comments.objects[0].__type, 'Pointer', 'Should be a Pointer __type/class');
+  equal(hash.comments.objects[0].className, 'Comment', 'Should be Comment class');
 });
