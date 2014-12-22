@@ -249,8 +249,8 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
       return "users";
     } else if ("login" === type) {
       return "login";
-    } else if ("me" === type) {
-      return "users/me";
+    } else if ("function" === type) {
+      return "functions";
     } else {
       return this.classesPath + '/' + this.parsePathForType(type);
     }
@@ -421,14 +421,20 @@ EmberParseAdapter.ParseUser = DS.Model.extend({
 
 EmberParseAdapter.ParseUser.reopenClass({
 
-  me: function(sessionToken) {
-    var adapter = this.store.adapterFor(this);
-    adapter.set('sessionToken', sessionToken);
-    return adapter.ajax(adapter.buildURL("me"), "GET")['catch'](
-      function(response){
-        return Ember.RSVP.reject(response.responseJSON);
-      }
-    );
+  current: function(store, data) {
+    if(Ember.isEmpty(this.typeKey)) {
+      throw new Error('ParseUser.current must be called on a model fetched via store.modelFor');
+    }
+
+    var model = this;
+    var adapter = store.adapterFor(model);
+    var serializer = store.serializerFor(model);
+    return adapter.ajax(adapter.buildURL("parseUser", "me"), "GET", {}).then(function(response) {
+      serializer.normalize(model, response);
+      return store.push(model, response);
+    }, function(response) {
+      return Ember.RSVP.reject(response.responseJSON);
+    });
   },
 
   requestPasswordReset: function(email){
