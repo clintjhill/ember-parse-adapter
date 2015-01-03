@@ -300,6 +300,11 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
     var id = record.get('id');
     var adapter = this;
 
+    // remove the password if we're updating a user
+    if(type.typeKey === 'parseUser') {
+      delete data.password;
+    }
+
     type.eachRelationship(function(key, relationship){
       if(data[key] && data[key].deleteds){
         deleteds[key] = data[key].deleteds;
