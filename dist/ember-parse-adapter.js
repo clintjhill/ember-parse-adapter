@@ -126,7 +126,7 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
     Ember.merge(hash, this.serialize(record, options));
   },
 
-  serializeAttribute: function(record, json, key, attribute) {
+  serializeAttribute: function(snapshot, json, key, attribute) {
     // These are Parse reserved properties and we won't send them.
     if( key === 'createdAt' ||
         key === 'updatedAt' ||
@@ -134,27 +134,27 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         key === 'sessionToken' ){
       delete json[key];
     } else {
-      this._super(record, json, key, attribute);
+      this._super(snapshot, json, key, attribute);
     }
   },
 
-  serializeBelongsTo: function(record, json, relationship){
+  serializeBelongsTo: function(snapshot, json, relationship){
     var key = relationship.key;
-    var belongsTo = record.get(key);
+    var belongsTo = snapshot.belongsTo(key);
     if(belongsTo){
       // TODO: Perhaps this is working around a bug in Ember-Data? Why should
       // promises be returned here.
       if (belongsTo instanceof DS.PromiseObject) {
-        if (!belongsTo.get('isFulfilled')) {
+        if (!belongsTo.attr('isFulfilled')) {
           throw new Error("belongsTo values *must* be fulfilled before attempting to serialize them");
         }
-        belongsTo = belongsTo.get('content');
+        belongsTo = belongsTo.attr('content');
       }
 
       json[key] = {
         "__type": "Pointer",
         "className": this.parseClassName(belongsTo.constructor.typeKey),
-        "objectId": belongsTo.get('id')
+        "objectId": belongsTo.attr('id')
       };
     }
   },
@@ -167,11 +167,11 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
     }
   },
 
-  serializeHasMany: function(record, json, relationship){
+  serializeHasMany: function(snapshot, json, relationship){
     var key = relationship.key;
-    var hasMany = record.get(key);
+    var hasMany = snapshot.hasMany(key);
     var options = relationship.options;
-    if(hasMany && hasMany.get('length') > 0){
+    if(hasMany && hasMany.attr('length') > 0){
 
       json[key] = { "objects": [] };
 
@@ -189,7 +189,7 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         json[key].objects.push({
           "__type": "Pointer",
           "className": _this.parseClassName(child.constructor.typeKey),
-          "objectId": child.get('id')
+          "objectId": child.attr('id')
         });
       });
 
