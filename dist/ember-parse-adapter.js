@@ -87,9 +87,15 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         // the links property so the adapter can async call the
         // relationship.
         // The adapter findHasMany has been overridden to make use of this.
-        if(options.relation){
+        if(options.relation) {
+          // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
+          // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
+          hash[key] = [];
+
+          // ember-data expects the link to be a string
+          // The adapter findHasMany will parse it
           hash.links = {};
-          hash.links[key] = {type: relationship.type, key: key};
+          hash.links[key] = JSON.stringify({type: relationship.type, key: key});
         }
 
         if(options.array){
@@ -356,7 +362,9 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
    * Implementation of a hasMany that provides a Relation query for Parse
    * objects.
    */
-  findHasMany: function(store, record, relatedInfo){
+  findHasMany: function(store, record, relatedInfo){    
+    var relatedInfo_ = JSON.parse(relatedInfo);
+    
     var query = {
       where: {
         "$relatedTo": {
