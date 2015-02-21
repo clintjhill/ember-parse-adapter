@@ -128,8 +128,8 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
     this._super(type, hash);
   },
 
-  serializeIntoHash: function(hash, type, record, options){
-    Ember.merge(hash, this.serialize(record, options));
+  serializeIntoHash: function(hash, type, snapshot, options){
+    Ember.merge(hash, this.serialize(snapshot, options));
   },
 
   serializeAttribute: function(snapshot, json, key, attribute) {
