@@ -140,7 +140,7 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         key === 'sessionToken' ){
       delete json[key];
     } else {
-      this._super(snapshot, json.attributes, key, attribute);
+      this._super(snapshot, json, key, attribute);
     }
   },
 
