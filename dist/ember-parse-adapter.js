@@ -541,28 +541,27 @@ EmberParseAdapter.ACL = Ember.Object.extend({
 
 EmberParseAdapter.Transforms.ACL = DS.Transform.extend({
 
-  deserialize: function(serialized) {
-    if (!serialized) {
-      return null;
-    }
+    deserialize: function(serialized) {
+        if (!serialized) {
+            return null;
+        }
 
-    return new EmberParseAdapter.ACL(serialized);
-  },
+        return EmberParseAdapter.ACL.create(serialized);
+    },
 
-  serialize: function(deserialized) {
-    if (!deserialized) {
-      return null;
-    }
+    serialize: function(deserialized) {
+        if (!deserialized) {
+            return null;
+        }
     
-    var hash = {};
+        var hash = {};
 
-    Object.keys(deserialized).forEach(function(key) {
-      hash[key] = deserialized.get(key);
-    });
+        Object.keys(deserialized).forEach(function(key) {
+            hash[key] = deserialized.get(key);
+        });
 
-    return hash;
-  }
-
+        return hash;
+    }
 });
 
 /*
