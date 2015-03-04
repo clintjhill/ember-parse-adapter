@@ -191,6 +191,20 @@ test("Find Query with where as string", function(){
   });
 });
 
+test("Find Query without where", function(){
+  posts = store.find('post', {title: 'First Post'});
+  equal(get(posts, 'length'), 0, "there are no posts yet as the query has not returned.");
+  expect(ajaxUrl, "/1/classes/Post", "requests the post class");
+  equal(ajaxType, "GET");
+  deepEqual(ajaxHash.data, {where: JSON.stringify({title: 'First Post'}) }, "where clause is passed as hashed like in store.find()");
+  ajaxHash.success({
+    results: [
+      { objectId: 'bad1', title: 'First Post'},
+      { objectId: 'bad2', title: 'First Post'}
+    ]
+  });
+});
+
 test("Create Record", function(){
   stop();
   var post, promise;

@@ -44,7 +44,7 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
    */
   extractMeta: function(store, type, payload) {
     if (payload && payload.count) {
-      store.metaForType(type, {count: payload.count});
+      store.setMetadataFor(type, {count: payload.count});
       delete payload.count;
     }
   },
@@ -87,9 +87,15 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         // the links property so the adapter can async call the
         // relationship.
         // The adapter findHasMany has been overridden to make use of this.
-        if(options.relation){
-          hash.links = {};
-          hash.links[key] = {type: relationship.type, key: key};
+        if(options.relation) {
+          // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
+          // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
+          hash[key] = [];
+
+          // ember-data expects the link to be a string
+          // The adapter findHasMany will parse it
+          if (!hash.links) hash.links = {};
+          hash.links[key] = JSON.stringify({typeKey: relationship.type.typeKey, key: key});
         }
 
         if(options.array){
@@ -122,8 +128,8 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
     this._super(type, hash);
   },
 
-  serializeIntoHash: function(hash, type, record, options){
-    Ember.merge(hash, this.serialize(record, options));
+  serializeIntoHash: function(hash, type, snapshot, options){
+    Ember.merge(hash, this.serialize(snapshot, options));
   },
 
   serializeAttribute: function(snapshot, json, key, attribute) {
@@ -134,29 +140,21 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         key === 'sessionToken' ){
       delete json[key];
     } else {
-      this._super(snapshot, json.attributes, key, attribute);
+      this._super(snapshot, json, key, attribute);
     }
   },
 
   serializeBelongsTo: function(snapshot, json, relationship){
     var key = relationship.key;
-    var belongsTo = snapshot.belongsTo(key);
-    if(belongsTo){
-      // TODO: Perhaps this is working around a bug in Ember-Data? Why should
-      // promises be returned here.
-      if (belongsTo instanceof DS.PromiseObject) {
-        if (!belongsTo.attr('isFulfilled')) {
-          throw new Error("belongsTo values *must* be fulfilled before attempting to serialize them");
-        }
-        belongsTo = belongsTo.attr('content');
-      }
 
-      json[key] = {
-        "__type": "Pointer",
-        "className": this.parseClassName(belongsTo.constructor.typeKey),
-        "objectId": belongsTo.attr('id')
-      };
-    }
+    var belongsTo = snapshot.belongsTo(key);
+    var belongsToId = snapshot.belongsTo(key, { id: true });
+
+    json[key] = {
+      "__type": "Pointer",
+      "className": this.parseClassName(key),
+      "objectId": belongsToId
+    };
   },
 
   parseClassName: function(key) {
@@ -171,7 +169,8 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
     var key = relationship.key;
     var hasMany = snapshot.hasMany(key);
     var options = relationship.options;
-    if(hasMany && hasMany.attr('length') > 0){
+
+    if((!Ember.isEmpty(hasMany)) && hasMany.get('length') > 0){
 
       json[key] = { "objects": [] };
 
@@ -188,7 +187,7 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
       hasMany.forEach(function(child){
         json[key].objects.push({
           "__type": "Pointer",
-          "className": _this.parseClassName(child.constructor.typeKey),
+          "className": _this.parseClassName(child.type.typeKey),
           "objectId": child.attr('id')
         });
       });
@@ -218,7 +217,9 @@ EmberParseAdapter.Serializer = DS.RESTSerializer.extend({
         }
       }
     } else {
-      json[key] = [];
+      if (!options.relation) {
+        json[key] = []; // Parse return a 400 bad request error if use an array to represent a relation
+      }
     }
   }
 
@@ -271,7 +272,10 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
   createRecord: function(store, type, record) {
     var data = {};
     var serializer = store.serializerFor(type.typeKey);
-    serializer.serializeIntoHash(data, type, record, { includeId: true });
+
+    var snapshot = record._createSnapshot();
+    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
+
     var adapter = this;
     return new Ember.RSVP.Promise(function(resolve, reject){
       adapter.ajax(adapter.buildURL(type.typeKey), "POST", { data: data }).then(
@@ -296,7 +300,10 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
     var deleteds = {};
     var sendDeletes = false;
     var serializer = store.serializerFor(type.typeKey);
-    serializer.serializeIntoHash(data, type, record);
+
+    var snapshot = record._createSnapshot();
+    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
+
     var id = record.get('id');
     var adapter = this;
 
@@ -356,7 +363,9 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
    * Implementation of a hasMany that provides a Relation query for Parse
    * objects.
    */
-  findHasMany: function(store, record, relatedInfo){
+  findHasMany: function(store, record, relatedInfo){    
+    var relatedInfo_ = JSON.parse(relatedInfo);
+
     var query = {
       where: {
         "$relatedTo": {
@@ -365,13 +374,13 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
             "className": this.parseClassName(record.typeKey || record.constructor.typeKey),
             "objectId": record.get('id')
           },
-          key: relatedInfo.key
+          key: relatedInfo_.key
         }
       }
     };
     // the request is to the related type and not the type for the record.
     // the query is where there is a pointer to this record.
-    return this.ajax(this.buildURL(relatedInfo.type.typeKey), "GET", { data: query });
+    return this.ajax(this.buildURL(relatedInfo_.typeKey), "GET", { data: query });
   },
 
   /**
@@ -390,8 +399,20 @@ EmberParseAdapter.Adapter = DS.RESTAdapter.extend({
    *     });
    */
   findQuery: function (store, type, query) {
-    if (query.where && Ember.typeOf(query.where) !== 'string') {
-      query.where = JSON.stringify(query.where);
+    if (!query.where) {
+      // eg:
+      //  - call: store.find("person", {name: "John"});
+      //  - call: findQuery(store, type, {name: "John"});
+      //  - query = {name: "John"}
+      //  - set: query = { where: '{"name":"John"}' }
+      var where = JSON.stringify(query);
+      query = {};
+      query.where = where;
+
+    } else {
+      if (Ember.typeOf(query.where) !== 'string') {
+        query.where = JSON.stringify(query.where);
+      }
     }
 
     // Pass to _super()
@@ -520,28 +541,27 @@ EmberParseAdapter.ACL = Ember.Object.extend({
 
 EmberParseAdapter.Transforms.ACL = DS.Transform.extend({
 
-  deserialize: function(serialized) {
-    if (!serialized) {
-      return null;
-    }
+    deserialize: function(serialized) {
+        if (!serialized) {
+            return null;
+        }
 
-    return new EmberParseAdapter.ACL(serialized);
-  },
+        return EmberParseAdapter.ACL.create(serialized);
+    },
 
-  serialize: function(deserialized) {
-    if (!deserialized) {
-      return null;
-    }
+    serialize: function(deserialized) {
+        if (!deserialized) {
+            return null;
+        }
     
-    var hash = {};
+        var hash = {};
 
-    Object.keys(deserialized).forEach(function(key) {
-      hash[key] = deserialized.get(key);
-    });
+        Object.keys(deserialized).forEach(function(key) {
+            hash[key] = deserialized.get(key);
+        });
 
-    return hash;
-  }
-
+        return hash;
+    }
 });
 
 /*
