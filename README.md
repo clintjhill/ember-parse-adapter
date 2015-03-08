@@ -6,7 +6,7 @@ the [Parse REST API](https://parse.com/docs/rest). This is a full Ember
 implementation against the Parse REST API without the use of the Parse
 JavaScript SDK.
 
-The [example.html](example.html) file contains some example usage.
+The demo application contains some example usage.
 
 Features
 --------
@@ -36,22 +36,22 @@ Get Started
 -----------
 
 You'll want to get an account at [Parse](https://parse.com). After this you will
-be provided with three keys:
+be provided with two keys:
 
 * Application ID
-* JavaScript Key
 * REST API Key
 
-You will need each of these to configure the ParseAdapter.
+You will need each of these to configure the ParseAdapter via entries in the `config/environment.js` file:
 
 ```javascript
-var App = Ember.Application.create();
+var ENV = {
+  ...
 
-App.ApplicationAdapter = EmberParseAdapter.Adapter.extend({
-  applicationId: '<YOUR APP ID HERE>',
-  restApiId: '<YOUR REST API KEY HERE>',
-  javascriptId: '<YOUR JAVASCRIPT KEY HERE>'
-});
+  APP: {
+    applicationId: '<YOUR APP ID HERE>',
+    restApiId: '<YOUR REST API KEY HERE>'
+  }
+};
 ```
 
 Any model using this adapter will be stored on Parse. Create models
@@ -71,29 +71,35 @@ App.Post = DS.Model.extend({
 });
 ```
 
+Demo
+----
+
+## Installation
+
+* `git clone` this repository
+* `npm install`
+* `bower install`
+
+## Running
+
+* `ember server`
+* View the demo at http://localhost:4200
+
+For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
+
+
 Roadmap
 -------
 
-* Move to ES6 modules.
 * Bring back relationships via Parse relation type?
 * Bytes type?
 * Parse Roles implementation.
 * Parse ACL implementation.
 
-Dev Notes
----------
 
-To get started with the codebase, be sure to run the standard dependency installs:
-
-```
-npm install
-bower install
-```
-
-Now you have several grunt tasks available:
+How to use this addon in your application
+-----------------------------------------
 
 ```
-grunt # -> builds the files into dist/
-grunt test # -> Runs the tests in the console
-grunt connect:server:keepalive # -> Runs the test server, visit http://localhost:8000/test/
+ember install:addon ember-parse-adapter
 ```
