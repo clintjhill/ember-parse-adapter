@@ -1,4 +1,4 @@
-Ember Data Adapter for Parse
+Ember Data Adapter for Parse [![Build Status](https://travis-ci.org/clintjhill/ember-parse-adapter.svg)](https://travis-ci.org/clintjhill/ember-parse-adapter)
 ===================
 
 An [Ember Data](https://github.com/emberjs/data) plugin built to use
