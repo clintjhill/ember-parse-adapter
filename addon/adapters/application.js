@@ -44,10 +44,11 @@ export default DS.RESTAdapter.extend({
   */
   createRecord: function( store, type, record ) {
     var serializer = store.serializerFor( type.typeKey ),
+      snapshot   = record._createSnapshot(),
       data       = {},
       adapter    = this;
 
-    serializer.serializeIntoHash( data, type, record, { includeId: true } );
+    serializer.serializeIntoHash( data, type, snapshot, { includeId: true } );
 
     return new Ember.RSVP.Promise( function( resolve, reject ) {
       adapter.ajax( adapter.buildURL( type.typeKey ), 'POST', { data: data } ).then(
@@ -70,13 +71,14 @@ export default DS.RESTAdapter.extend({
   */
   updateRecord: function(store, type, record) {
     var serializer  = store.serializerFor( type.typeKey ),
+      snapshot    = record._createSnapshot(),
       id          = record.get( 'id' ),
       sendDeletes = false,
       deleteds    = {},
       data        = {},
       adapter     = this;
 
-    serializer.serializeIntoHash(data, type, record);
+    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
 
     type.eachRelationship(function( key ) {
       if ( data[key] && data[key].deleteds ) {
@@ -128,7 +130,8 @@ export default DS.RESTAdapter.extend({
   * objects.
   */
   findHasMany: function( store, record, relatedInfo ) {
-    var query = {
+    var relatedInfo_ = JSON.parse( relatedInfo ),
+        query        = {
         where: {
           '$relatedTo': {
             'object': {
@@ -136,14 +139,14 @@ export default DS.RESTAdapter.extend({
               'className' : this.parseClassName( record.typeKey ),
               'objectId'  : record.get( 'id' )
             },
-            key: relatedInfo.key
+            key: relatedInfo_.key
           }
         }
     };
 
     // the request is to the related type and not the type for the record.
     // the query is where there is a pointer to this record.
-    return this.ajax( this.buildURL( relatedInfo.type.typeKey ), 'GET', { data: query } );
+    return this.ajax( this.buildURL( relatedInfo_.typeKey ), "GET", { data: query } );
   },
 
   /**
