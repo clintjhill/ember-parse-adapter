@@ -42,7 +42,7 @@ export default DS.RESTSerializer.extend({
   */
   extractMeta: function( store, type, payload ) {
     if ( payload && payload.count ) {
-      store.metaForType( type, { count: payload.count } );
+      store.setMetadataFor( type, { count: payload.count } );
       delete payload.count;
     }
   },
@@ -86,9 +86,18 @@ export default DS.RESTSerializer.extend({
         // the links property so the adapter can async call the
         // relationship.
         // The adapter findHasMany has been overridden to make use of this.
-        if ( options.relation ) {
-          hash.links = {};
-          hash.links[key] = { type: relationship.type, key: key };
+        if(options.relation) {
+          // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
+          // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
+          hash[key] = [];
+
+          // ember-data expects the link to be a string
+          // The adapter findHasMany will parse it
+          if (!hash.links) {
+            hash.links = {};
+          }
+
+          hash.links[key] = JSON.stringify({typeKey: relationship.type.typeKey, key: key});
         }
 
         if ( options.array ) {
@@ -121,11 +130,11 @@ export default DS.RESTSerializer.extend({
     this._super( type, hash );
   },
 
-  serializeIntoHash: function( hash, type, record, options ) {
-    Ember.merge( hash, this.serialize( record, options ) );
+  serializeIntoHash: function( hash, type, snapshot, options ) {
+    Ember.merge( hash, this.serialize( snapshot, options ) );
   },
 
-  serializeAttribute: function( record, json, key, attribute ) {
+  serializeAttribute: function( snapshot, json, key, attribute ) {
     // These are Parse reserved properties and we won't send them.
     if ( 'createdAt' === key ||
          'updatedAt' === key ||
@@ -135,29 +144,19 @@ export default DS.RESTSerializer.extend({
       delete json[key];
 
     } else {
-      this._super( record, json, key, attribute );
+      this._super( snapshot, json, key, attribute );
     }
   },
 
-  serializeBelongsTo: function( record, json, relationship ) {
-    var key       = relationship.key,
-      belongsTo = record.get( key );
+  serializeBelongsTo: function( snapshot, json, relationship ) {
+    var key         = relationship.key,
+        belongsToId = snapshot.belongsTo(key, { id: true });
 
-    if ( belongsTo ) {
-      // @TODO: Perhaps this is working around a bug in Ember-Data? Why should
-      // promises be returned here.
-      if ( belongsTo instanceof DS.PromiseObject ) {
-        if ( !belongsTo.get('isFulfilled' ) ) {
-          throw new Error( 'belongsTo values *must* be fulfilled before attempting to serialize them' );
-        }
-
-        belongsTo = belongsTo.get( 'content' );
-      }
-
+    if ( belongsToId ) {
       json[key] = {
         '__type'    : 'Pointer',
-        'className' : this.parseClassName( belongsTo.constructor.typeKey ),
-        'objectId'  : belongsTo.get( 'id' )
+        'className' : this.parseClassName(key),
+        'objectId'  : belongsToId
       };
     }
   },
@@ -171,10 +170,11 @@ export default DS.RESTSerializer.extend({
     }
   },
 
-  serializeHasMany: function( record, json, relationship ) {
-    var key     = relationship.key,
-      hasMany = record.get( key ),
-      options = relationship.options;
+  serializeHasMany: function( snapshot, json, relationship ) {
+    var key   = relationship.key,
+      hasMany = snapshot.hasMany( key ),
+      options = relationship.options,
+      _this   = this;
 
     if ( hasMany && hasMany.get( 'length' ) > 0 ) {
       json[key] = { 'objects': [] };
@@ -190,8 +190,8 @@ export default DS.RESTSerializer.extend({
       hasMany.forEach( function( child ) {
         json[key].objects.push({
           '__type'    : 'Pointer',
-          'className' : child.parseClassName(),
-          'objectId'  : child.get( 'id' )
+          'className' : _this.parseClassName(child.type.typeKey),
+          'objectId'  : child.attr( 'id' )
         });
       });
 
