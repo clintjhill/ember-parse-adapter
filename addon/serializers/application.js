@@ -148,25 +148,24 @@ export default DS.RESTSerializer.extend({
     }
   },
 
-  serializeBelongsTo: function( snapshot, json, relationship ) {
+  serializeBelongsTo: function(snapshot, json, relationship) {
     var key         = relationship.key,
         belongsToId = snapshot.belongsTo(key, { id: true });
 
-    if ( belongsToId ) {
+    if (belongsToId) {
       json[key] = {
         '__type'    : 'Pointer',
-        'className' : this.parseClassName(key),
+        'className' : this.parseClassName(relationship.type.typeKey),
         'objectId'  : belongsToId
       };
     }
   },
 
-  parseClassName: function( key ) {
-    if ( 'parseUser' === key) {
+  parseClassName: function(key) {
+    if ('parseUser' === key) {
       return '_User';
-
     } else {
-      return Ember.String.capitalize( Ember.String.camelize( key ) );
+      return Ember.String.capitalize(Ember.String.camelize(key));
     }
   },
 
