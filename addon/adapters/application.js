@@ -173,12 +173,12 @@ export default DS.RESTAdapter.extend({
     return this._super( store, type, query );
   },
 
-  sessionToken: Ember.computed( 'headers.X-Parse-Session-Token', {
-    get( key ) {
-      return this.get( 'headers.X-Parse-Session-Token' );
+  sessionToken: Ember.computed('headers.X-Parse-Session-Token', {
+    get: function get() {
+      return this.get('headers.X-Parse-Session-Token');
     },
-    set( key, value ) {
-      this.set( 'headers.X-Parse-Session-Token', value );
+    set: function set(value) {
+      this.set('headers.X-Parse-Session-Token', value);
       return value;
     }
   })
