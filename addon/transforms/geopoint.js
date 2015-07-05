@@ -31,26 +31,26 @@ import GeoPoint from './geopoint';
  */
 export default DS.Transform.extend({
 
-  deserialize: function( serialized ) {
-    if ( !serialized ) {
+  deserialize(serialized) {
+    if (!serialized) {
       return null;
     }
 
     return GeoPoint.create({
-      latitude  : serialized.latitude,
-      longitude : serialized.longitude
+      latitude: serialized.latitude,
+      longitude: serialized.longitude
     });
   },
 
-  serialize: function( deserialized ) {
-    if ( !deserialized ) {
+  serialize(deserialized) {
+    if (!deserialized) {
       return null;
     }
 
     return {
-      __type    : 'GeoPoint',
-      latitude  : deserialized.get( 'latitude' ),
-      longitude : deserialized.get( 'longitude' )
+      __type: 'GeoPoint',
+      latitude: deserialized.get('latitude'),
+      longitude: deserialized.get('longitude')
     };
   }
 

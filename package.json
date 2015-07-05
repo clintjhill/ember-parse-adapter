@@ -1,7 +1,7 @@
 {
   "name": "ember-parse-adapter",
-  "version": "0.5.3",
-  "description": "Ember Data Adapter for Parse",
+  "version": "0.0.10-alpha",
+  "description": "All you need to use Parse. Includes an adapter, serializer and a session service for auth.",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -9,7 +9,8 @@
   "scripts": {
     "start": "ember server",
     "build": "ember build",
-    "test": "ember test"
+    "test": "ember try:testall",
+    "clean": "rm -rf node_modules && rm -rf bower_components && rm -rf tmp && rm -rf dist"
   },
   "bugs": "https://github.com/clintjhill/ember-parse-adapter/issues",
   "repository": {
@@ -21,30 +22,38 @@
   },
   "contributors": [
     "Clint Hill <clint.hill@gmail.com>",
-    "Matt Beale <matt.beale@madhatted.com>"
+    "Matt Beale <matt.beale@madhatted.com>",
+    "Giovanni Collazo <hello@gcollazo.com>"
   ],
   "license": "MIT",
   "devDependencies": {
-    "broccoli-asset-rev": "^2.0.0",
-    "ember-cli": "0.2.0",
-    "ember-cli-app-version": "0.3.2",
-    "ember-cli-babel": "^4.0.0",
-    "ember-cli-dependency-checker": "0.0.8",
-    "ember-cli-htmlbars": "0.7.4",
+    "broccoli-asset-rev": "^2.0.2",
+    "ember-cli": "0.2.7",
+    "ember-cli-app-version": "0.3.3",
+    "ember-cli-content-security-policy": "0.4.0",
+    "ember-cli-dependency-checker": "^1.0.0",
+    "ember-cli-github-pages": "0.0.6",
+    "ember-cli-htmlbars": "0.7.6",
     "ember-cli-ic-ajax": "0.1.1",
     "ember-cli-inject-live-reload": "^1.3.0",
-    "ember-cli-qunit": "0.3.9",
-    "ember-cli-uglify": "1.0.1",
-    "ember-data": "1.0.0-beta.15",
-    "ember-export-application-global": "^1.0.2"
+    "ember-cli-qunit": "0.3.13",
+    "ember-cli-uglify": "^1.0.1",
+    "ember-data": "1.13.2",
+    "ember-disable-prototype-extensions": "^1.0.0",
+    "ember-disable-proxy-controllers": "^1.0.0",
+    "ember-export-application-global": "^1.0.2",
+    "ember-try": "0.0.6"
   },
   "keywords": [
     "ember-addon",
-    "parse",
-    "ember.js",
-    "ember-data"
+    "ember-data",
+    "parse"
   ],
+  "dependencies": {
+    "ember-cli-babel": "^5.0.0"
+  },
   "ember-addon": {
-    "configPath": "tests/dummy/config"
+    "configPath": "tests/dummy/config",
+    "demoURL": "https://getblimp.github.io/ember-parse/"
   }
 }
