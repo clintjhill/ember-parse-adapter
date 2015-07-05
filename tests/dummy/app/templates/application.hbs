@@ -1,28 +1,105 @@
-<div class="row">
-  <div class="col-md-12 text-center">
-    <h3>Ember Data Adapter for Parse</h3>
-    <p class="lead">An adapter built specifically to use with the Parse.com REST API</p>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h2 id="title">Ember Parse</h2>
+
+      {{#if isAuthenticated}}
+        <form {{action "resetPassword" on="submit"}}>
+          <div class="form-group">
+            {{input type="text" value=username placeholder="email" class="form-control"}}
+          </div>
+          <button type="submit" class="btn btn-default">Reset password</button>
+          <a href="#" {{action "logout"}} class="btn btn-warning pull-right">Logout</a>
+        </form>
+      {{else}}
+        {{#if authError}}
+          <p>
+            {{authError}}
+          </p>
+        {{/if}}
+
+        <form {{action "login" on="submit"}}>
+          <div class="form-group">
+            {{input type="text" value=username placeholder="username" class="form-control"}}
+          </div>
+          <div class="form-group">
+            {{input type="text" value=password placeholder="password" class="form-control"}}
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+          <button {{action "signup"}} class="btn btn-default">Sign up</button>
+        </form>
+      {{/if}}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <a href="#" {{action "createObject"}} class="btn btn-success">Create Object</a>
+      <br><br>
+
+      <table class="table">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Friends</th>
+          <th>Cars</th>
+          <th>Date Created</th>
+          <th>Actions</th>
+        </tr>
+        <tbody class="table-striped">
+          {{#each model as |thing|}}
+            <tr>
+              <td>{{thing.id}}</td>
+              <td>{{thing.name}}</td>
+              <td>{{thing.category.name}}</td>
+              <td>
+                {{#each thing.friends as |friend|}}
+                  {{friend.name}} <a href="#" {{action 'removeFriend' thing friend}} class="btn btn-default btn-xs">Delete</a><br>
+                {{/each}}
+              </td>
+              <td>
+                {{#each thing.cars as |car|}}
+                  {{car.name}} <a href="#" {{action 'updateCar' car}} class="btn btn-default btn-xs">Update</a><br>
+                {{/each}}
+              </td>
+              <td>
+                {{thing.createdAt}}
+              </td>
+              <td>
+                <a href="#" {{action "deleteObject" thing}} class="btn btn-default">Delete</a>
+                <a href="#" {{action "updateObject" thing}} class="btn btn-default">Update</a>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <button {{action 'runCloudCode'}} class="btn btn-default">Run Cloud Code</button>
+      <br><br>
+      {{#if cloudCodeResult}}
+        <pre>{{cloudCodeResult}}</pre>
+      {{/if}}
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <button {{action 'triggerError'}} class="btn btn-default">Trigger Error</button>
+      <br><br>
+      {{#if triggeredError}}
+        <pre>{{triggeredError}}</pre>
+      {{/if}}
+    </div>
   </div>
 </div>
-
-<div class="row">
-  <div class="col-md-12 text-center">
-    SELECT A DEMO:
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "signup"}}Sign Up{{/link-to}}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "login"}}Login{{/link-to}}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "simple"}}Simple Model{{/link-to}}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "belongsto"}}Belongs To{{/link-to}}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "hasmany"}}Has Many{{/link-to}}
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    {{#link-to "facebook"}}Facebook Login{{/link-to}}
-  </div>
-</div>
-
-<br><br><br>
-
-{{outlet}}

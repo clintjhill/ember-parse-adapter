@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-parse-adapter'
+  name: 'ember-parse'
 };

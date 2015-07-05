@@ -1,80 +1,64 @@
-Ember Data Adapter for Parse [![Build Status](https://travis-ci.org/clintjhill/ember-parse-adapter.svg)](https://travis-ci.org/clintjhill/ember-parse-adapter)
-===================
+# Parse for Ember.js
 
-An [Ember Data](https://github.com/emberjs/data) plugin built to use
-the [Parse REST API](https://parse.com/docs/rest). This is a full Ember
-implementation against the Parse REST API without the use of the Parse
-JavaScript SDK.
+This addon has all you need to use [Parse](https://parse.com/) in your Ember.js application. It includes an adapter and serializer to integrate with ember-data and a session service to provide authentication.
 
-The demo application contains some example usage.
+## WORK-IN-PROGRESS
+This is still a work in progress.
 
-Features
---------
+#### Tests
+- [ ] Test session service is injected in routes
+- [ ] Test session service is injected in controllers
+- [ ] Test session service is injected in components
+- [ ] Test session service can register new user
+- [ ] Test session service can login user
+- [ ] Test session service can request password reset for user
+- [ ] Test session service sets sessionToken in adapter
+- [ ] Test get single record
+- [ ] Test get many records
+- [ ] Test create record
+- [ ] Test update record
+- [ ] Test delete record
+- [ ] Test get belongs-to relation
+- [ ] Test create belongs-to relation
+- [ ] Test update belongs-to relation
+- [ ] Test delete belongs-to relation
+- [ ] Test get many-to-many relation
+- [ ] Test create many-to-many relation
+- [ ] Test update many-to-many relation
+- [ ] Test delete many-to-many relation
 
-##### EmberParseAdapter.Serializer
+#### Features
+- [ ] ApplicationRouteMixin
+- [X] AuthenticatedRouteMixin
+- [X] Blueprint to generate application files
 
-  * Provides the translation of objectId to id for identity mapping.
-  * Provides encoding of hasMany associations to arrays of [Parse Pointer objects](https://parse.com/docs/rest#objects-types).
+## Getting Started
+Since this is still a work in progress, we don't have any documentation. In the meantime you can take a look at the [dummy app](https://github.com/GetBlimp/ember-parse/tree/master/tests/dummy) to get an idea of how the addon works.
 
-##### EmberParseAdapter.Adapter
+## Installation
 
-  * Implements the persistence layer to Parse by extending the Ember Data REST Adapter.
-  * Provides a `sessionToken` property which can set a session token.
+* `ember install:addon ember-parse`
+* `ember generate ember-parse-core` :point_left: To add the adapter and serializer
+* `ember generate ember-parse-session` :point_left: To add the session service and user model
 
-##### EmberParseAdapter.ParseUser
+#### config/environment.js
 
-  * Login
-  * Signup
-  * Request password reset
-  * Is stored at the special user endpoint at parse
-
-##### EmberParseAdapter.Transforms
-
-  * Provides transforms for file, geo, and date types at Parse.
-
-Get Started
------------
-
-You'll want to get an account at [Parse](https://parse.com). After this you will
-be provided with two keys:
-
-* Application ID
-* REST API Key
-
-You will need each of these to configure the ParseAdapter via entries in the `config/environment.js` file:
-
-```javascript
-var ENV = {
-  ...
-
-  APP: {
-    applicationId: '<YOUR APP ID HERE>',
-    restApiId: '<YOUR REST API KEY HERE>'
+```js
+ENV['ember-parse'] = {
+  PARSE_APPLICATION_ID: '<your app id goes here>',
+  PARSE_JAVASCRIPT_KEY: '<your key goes here>',
+  session: {
+    authenticationRoute: 'index', // Route where your login form is located
+    ifAlreadyAuthenticatedRoute: 'dashboard' // Route to redirect logged in users
   }
 };
 ```
 
-Any model using this adapter will be stored on Parse. Create models
-as you would normally:
+## Compatibility
 
-```javascript
-App.Post = DS.Model.extend({
-  // Attributes can use normal transforms
-  title: DS.attr('string'),
-  body: DS.attr('string'),
-  // Or there are special transforms for some data-types
-  avatar: DS.attr('parse-file'),
-  // There is a parse-date transform, but sometimes dates are just strings
-  updatedAt: DS.attr('date'),
-  // ALWAYS refer to relationships as async, for now.
-  user: DS.belongsTo('user', {async: true})
-});
-```
+* ember-data >= "1.0.0-beta.19.1"
 
-Demo
-----
-
-## Installation
+## Development
 
 * `git clone` this repository
 * `npm install`
@@ -83,23 +67,15 @@ Demo
 ## Running
 
 * `ember server`
-* View the demo at http://localhost:4200
+* Visit your app at http://localhost:4200.
+
+## Running Tests
+
+* `ember test`
+* `ember test --server`
+
+## Building
+
+* `ember build`
 
 For more information on using ember-cli, visit [http://www.ember-cli.com/](http://www.ember-cli.com/).
-
-
-Roadmap
--------
-
-* Bring back relationships via Parse relation type?
-* Bytes type?
-* Parse Roles implementation.
-* Parse ACL implementation.
-
-
-How to use this addon in your application
------------------------------------------
-
-```
-ember install:addon ember-parse-adapter
-```

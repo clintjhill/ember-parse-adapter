@@ -31,26 +31,26 @@ import File from './file';
  */
 export default DS.Transform.extend({
 
-  deserialize: function( serialized ) {
-    if ( !serialized ) {
+  deserialize(serialized) {
+    if (!serialized) {
       return null;
     }
 
     return File.create({
-      name : serialized.name,
-      url  : serialized.url
+      name: serialized.name,
+      url: serialized.url
     });
   },
 
-  serialize: function( deserialized ) {
-    if ( !deserialized ) {
+  serialize(deserialized) {
+    if (!deserialized) {
       return null;
     }
 
     return {
-      __type : 'File',
-      name   : deserialized.get( 'name' ),
-      url    : deserialized.get( 'url' )
+      __type: 'File',
+      name: deserialized.get('name'),
+      url: deserialized.get('url')
     };
   }
 

@@ -18,22 +18,22 @@ import DS from 'ember-data';
  */
 export default DS.Transform.extend({
 
-  deserialize: function( serialized ) {
-    if ( !serialized ) {
+  deserialize(serialized) {
+    if (!serialized) {
       return null;
     }
 
-    return new Date( serialized );
+    return new Date(serialized);
   },
 
-  serialize: function( deserialized ) {
-    if ( !deserialized ) {
+  serialize(deserialized) {
+    if (!deserialized) {
       return null;
     }
 
     return {
-      __type : 'Date',
-      iso    : deserialized.toISOString()
+      __type: 'Date',
+      iso: deserialized.toISOString()
     };
   }
 
