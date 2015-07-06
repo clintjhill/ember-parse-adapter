@@ -17,8 +17,18 @@ module.exports = function(environment) {
       // Here you can pass flags/options to your application instance
       // when it is created
       applicationId: 'Hf7dgrv4WPBcJYUsLgDMZCwKxf3hdbAc1nnSsVza',
-      restApiId: 'BH0IoMxroXSVU3GTMQTVaM4BXjvdX7lKtFujgvzO'
+      javascriptKey: 'BH0IoMxroXSVU3GTMQTVaM4BXjvdX7lKtFujgvzO'
     }
+  };
+
+  ENV.contentSecurityPolicy = {
+    'default-src': "'none'",
+    'script-src': "'self' cdnjs.cloudflare.com",
+    'font-src': "'self' cdnjs.cloudflare.com",
+    'connect-src': "'self' api.parse.com",
+    'img-src': "'self'",
+    'style-src': "'self' 'unsafe-inline' cdnjs.cloudflare.com",
+    'media-src': "'self'"
   };
 
   if (environment === 'development') {

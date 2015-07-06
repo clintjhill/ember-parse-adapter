@@ -18,8 +18,8 @@ var ParseUser = DS.Model.extend({
 
 ParseUser.reopenClass({
   requestPasswordReset: function( email ) {
-    var adapter = this.get( 'store' ).adapterFor( this ),
-        data    = { email: email };
+    var adapter = this.get( 'store' ).adapterFor( 'parse-user' ),
+        data    = { email: email, _method: 'POST' };
 
     return adapter.ajax( adapter.buildURL( 'requestPasswordReset' ), 'POST', { data:data } )['catch'] (
       function( response ) {
@@ -30,17 +30,19 @@ ParseUser.reopenClass({
 
   login: function( store, data ) {
     var model      = this,
-        adapter    = store.adapterFor( model ),
-        serializer = store.serializerFor( model );
+        adapter    = store.adapterFor( 'application' ),
+        serializer = store.serializerFor( 'parse-user' );
+
+    data._method = 'GET';
 
     if ( Ember.isEmpty( this.typeKey ) ) {
       throw new Error( 'Parse login must be called on a model fetched via store.modelFor' );
     }
 
-    return adapter.ajax( adapter.buildURL( 'login' ), 'GET', { data: data } ).then(
+    return adapter.ajax( adapter.buildURL( 'login' ), 'POST', { data: data } ).then(
       function( response ) {
         serializer.normalize( model, response );
-        var record = store.push( model, response );
+        var record = store.push( 'parse-user', response );
         return record;
       },
       function( response ) {
@@ -51,19 +53,21 @@ ParseUser.reopenClass({
 
   signup: function( store, data ) {
     var model      = this,
-        adapter    = store.adapterFor(model),
-        serializer = store.serializerFor(model);
+        adapter    = store.adapterFor( 'parse-user' ),
+        serializer = store.serializerFor( 'parse-user' );
+
+    data['_method'] = 'POST';
 
     if ( Ember.isEmpty( this.typeKey ) ) {
       throw new Error( 'Parse signup must be called on a model fetched via store.modelFor' );
     }
 
-    return adapter.ajax( adapter.buildURL( model.typeKey ), 'POST', { data: data } ).then(
+    return adapter.ajax( adapter.buildURL( model.modelName ), 'POST', { data: data } ).then(
       function( response ) {
         serializer.normalize( model, response );
         response.email = response.email || data.email;
         response.username = response.username || data.username;
-        var record = store.push( model, response );
+        var record = store.push( 'parse-user', response );
         return record;
       },
       function( response ) {
