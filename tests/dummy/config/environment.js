@@ -21,6 +21,16 @@ module.exports = function(environment) {
     }
   };
 
+  ENV.contentSecurityPolicy = {
+    'default-src': "'none'",
+    'script-src': "'self' cdnjs.cloudflare.com",
+    'font-src': "'self' cdnjs.cloudflare.com",
+    'connect-src': "'self' api.parse.com",
+    'img-src': "'self'",
+    'style-src': "'self' 'unsafe-inline' cdnjs.cloudflare.com",
+    'media-src': "'self'"
+  };
+
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
