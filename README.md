@@ -71,6 +71,20 @@ App.Post = DS.Model.extend({
 });
 ```
 
+Security Warning
+----------------
+Before publishing your app you should **disable REST Push**. Parse apps are created with this feature enabled by default. If this feature is enabled anyone with your `Application ID` and `REST API Key` will be able to send push notifications to your user's devices. Anyone using your app has access your `Application ID` and `REST API Key`.
+
+To disable REST Push:
+
+- Login to your Parse account.
+- Click on your application.
+- Go to Settings > Push.
+- And disable REST Push.
+- It should look like the image below.
+
+![](http://x.gcollazo.com/B5Qk40KL6m.png)
+
 Demo
 ----
 
