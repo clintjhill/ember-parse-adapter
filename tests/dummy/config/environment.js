@@ -20,6 +20,16 @@ module.exports = function(environment) {
       restApiId: 'BH0IoMxroXSVU3GTMQTVaM4BXjvdX7lKtFujgvzO'
     }
   };
+  
+  ENV.contentSecurityPolicy = {
+    'default-src': "'none'",
+    'script-src': "'self' https://cdnjs.cloudflare.com",
+    'font-src': "'self' https://cdnjs.cloudflare.com",
+    'connect-src': "'self' https://api.parse.com",
+    'img-src': "'self'",
+    'style-src': "'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
+    'media-src': "'self'"
+  };
 
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;

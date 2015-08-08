@@ -7,8 +7,7 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 
-var get = Ember.get,
-    forEach = Ember.ArrayPolyfills.forEach;
+var get = Ember.get;
 
 
 export default DS.RESTAdapter.extend({
@@ -60,34 +59,6 @@ export default DS.RESTAdapter.extend({
     }
   },
 
-  /* ajaxOptions(url, type, options) {
-    var hash = options || {};
-    hash.data = hash.data || {};
-    hash.url = url;
-    hash.type = type;
-    hash.dataType = 'json';
-    hash.context = this;
-
-    hash.contentType = 'application/json; charset=utf-8';
-
-    // Parse auth stuff
-    hash.data._ClientVersion = this.get('parseClientVersion');
-    hash.data._InstallationId = this.get('installationId');
-
-    hash.data = JSON.stringify(hash.data);
-
-    var headers = get(this, 'headers');
-    if (headers !== undefined) {
-      hash.beforeSend = function (xhr) {
-        forEach.call(Ember.keys(headers), function(key) {
-          xhr.setRequestHeader(key, headers[key]);
-        });
-      };
-    }
-
-    return hash;
-  }, */
-
   ajaxError(jqXHR, responseText, errorThrown) {
     if (jqXHR.responseJSON.error === 'invalid session token') {
       // invalid session
@@ -110,7 +81,7 @@ export default DS.RESTAdapter.extend({
   },
 
   pathForType(type) {
-    if ('user' === type) {
+    if ('parseUser' === type) {
       return 'users';
 
     } else if ('login' === type) {
