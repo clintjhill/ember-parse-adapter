@@ -25,7 +25,7 @@ module.exports = function(environment) {
     'default-src': "'none'",
     'script-src': "'self' http://cdnjs.cloudflare.com",
     'font-src': "'self' http://cdnjs.cloudflare.com",
-    'connect-src': "'self' https://api.mixpanel.com http://custom-api.local",
+    'connect-src': "'self' https://api.parse.com",
     'img-src': "'self'",
     'style-src': "'self' 'unsafe-inline' http://cdnjs.cloudflare.com",
     'media-src': "'self'"
