@@ -11,6 +11,8 @@ export default Ember.Controller.extend({
         controller = this;
 
       tiger.set( 'name', this.get( 'name' ) );
+      
+      console.log(tiger);
 
       tiger.save().then( function() {
         controller.set( 'saved', true );
