@@ -177,7 +177,7 @@ export default DS.RESTAdapter.extend({
     get: function get() {
       return this.get('headers.X-Parse-Session-Token');
     },
-    set: function set(value) {
+    set: function set(key, value) {
       this.set('headers.X-Parse-Session-Token', value);
       return value;
     }
