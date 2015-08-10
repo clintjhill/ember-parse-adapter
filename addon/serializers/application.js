@@ -86,7 +86,7 @@ export default DS.RESTSerializer.extend({
         // the links property so the adapter can async call the
         // relationship.
         // The adapter findHasMany has been overridden to make use of this.
-        if(options.relation) {
+        //if(options.relation) {
           // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
           // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
           hash[key] = [];
@@ -98,7 +98,7 @@ export default DS.RESTSerializer.extend({
           }
 
           hash.links[key] = JSON.stringify({typeKey: relationship.type.typeKey, key: key});
-        }
+        //}
 
         if ( options.array ) {
           // Parse will return [null] for empty relationships
@@ -178,13 +178,17 @@ export default DS.RESTSerializer.extend({
     if ( hasMany && hasMany.get( 'length' ) > 0 ) {
       json[key] = { 'objects': [] };
 
-      if ( options.relation ) {
+      // an array is not a relationship, right?
+      
+      /*if ( options.relation ) {
         json[key].__op = 'AddRelation';
       }
 
       if ( options.array ) {
         json[key].__op = 'AddUnique';
-      }
+      }*/
+      
+      json[key].__op = 'AddRelation';
 
       hasMany.forEach( function( child ) {
         json[key].objects.push({
