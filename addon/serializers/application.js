@@ -19,7 +19,7 @@ export default DS.RESTSerializer.extend({
     return this._super( store, primaryType, namespacedPayload, recordId );
   },
 
-  typeForRoot: function( key ) {
+  modelNameFromPayloadKey: function( key ) {
     return Ember.String.dasherize( Ember.String.singularize( key ) );
   },
 
@@ -86,7 +86,7 @@ export default DS.RESTSerializer.extend({
         // the links property so the adapter can async call the
         // relationship.
         // The adapter findHasMany has been overridden to make use of this.
-        if(options.relation) {
+        //if(options.relation) {
           // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
           // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
           hash[key] = [];
@@ -98,7 +98,7 @@ export default DS.RESTSerializer.extend({
           }
 
           hash.links[key] = JSON.stringify({typeKey: relationship.type.typeKey, key: key});
-        }
+        //}
 
         if ( options.array ) {
           // Parse will return [null] for empty relationships
@@ -148,25 +148,24 @@ export default DS.RESTSerializer.extend({
     }
   },
 
-  serializeBelongsTo: function( snapshot, json, relationship ) {
+  serializeBelongsTo: function(snapshot, json, relationship) {
     var key         = relationship.key,
         belongsToId = snapshot.belongsTo(key, { id: true });
 
-    if ( belongsToId ) {
+    if (belongsToId) {
       json[key] = {
         '__type'    : 'Pointer',
-        'className' : this.parseClassName(key),
+        'className' : this.parseClassName(relationship.type.typeKey),
         'objectId'  : belongsToId
       };
     }
   },
 
-  parseClassName: function( key ) {
-    if ( 'parseUser' === key) {
+  parseClassName: function(key) {
+    if ('parseUser' === key) {
       return '_User';
-
     } else {
-      return Ember.String.capitalize( Ember.String.camelize( key ) );
+      return Ember.String.capitalize(Ember.String.camelize(key));
     }
   },
 
@@ -179,19 +178,23 @@ export default DS.RESTSerializer.extend({
     if ( hasMany && hasMany.get( 'length' ) > 0 ) {
       json[key] = { 'objects': [] };
 
-      if ( options.relation ) {
+      // an array is not a relationship, right?
+      
+      /*if ( options.relation ) {
         json[key].__op = 'AddRelation';
       }
 
       if ( options.array ) {
         json[key].__op = 'AddUnique';
-      }
+      }*/
+      
+      json[key].__op = 'AddRelation';
 
       hasMany.forEach( function( child ) {
         json[key].objects.push({
           '__type'    : 'Pointer',
           'className' : _this.parseClassName(child.type.typeKey),
-          'objectId'  : child.attr( 'id' )
+          'objectId'  : child.id
         });
       });
 
@@ -225,7 +228,7 @@ export default DS.RESTSerializer.extend({
       }
 
     } else {
-      json[key] = [];
+      json[key] = null;
     }
   }
 
