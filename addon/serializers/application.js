@@ -19,7 +19,7 @@ export default DS.RESTSerializer.extend({
     return this._super( store, primaryType, namespacedPayload, recordId );
   },
 
-  typeForRoot: function( key ) {
+  modelNameFromPayloadKey: function( key ) {
     return Ember.String.dasherize( Ember.String.singularize( key ) );
   },
 

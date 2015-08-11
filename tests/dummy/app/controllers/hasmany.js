@@ -24,6 +24,23 @@ export default Ember.Controller.extend({
       stripe.save().then( function( stripe ) {
         tiger.save();
       });
+    },
+    
+    getTiger: function() {
+      this.store.find('tiger', 'PSXJQXnnyU')
+      .then(function(tiger) {
+        console.log(tiger);
+      }); 
+    },
+    
+    getStripes: function() {
+      this.store.find('tiger', 'PSXJQXnnyU')
+      .then(function(tiger) {
+        return tiger.get('stripes');
+      })
+      .then(function(stripes) {
+        console.log(stripes);
+      });      
     }
     
   }
