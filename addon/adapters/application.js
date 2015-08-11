@@ -127,7 +127,7 @@ export default DS.RESTAdapter.extend({
   * Implementation of a hasMany that provides a Relation query for Parse
   * objects.
   */
-  findHasMany: function( store, snapshot, url/*, relationship */ ) {
+  findHasMany: function( store, snapshot, url, relationship ) {
     var relatedInfo_ = JSON.parse( url ),
         query        = {
         where: {
@@ -146,7 +146,7 @@ export default DS.RESTAdapter.extend({
 
     // the request is to the related type and not the type for the record.
     // the query is where there is a pointer to this record.
-    return this.ajax( this.buildURL( relatedInfo_.typeKey ), "GET", { data: query } );
+    return this.ajax( this.buildURL( relationship.type ), "GET", { data: query } );
   },
 
   /**
