@@ -97,7 +97,7 @@ export default DS.RESTSerializer.extend({
             hash.links = {};
           }
 
-          hash.links[key] = JSON.stringify({typeKey: relationship.type.typeKey, key: key});
+          hash.links[key] = JSON.stringify({typeKey: relationship.type, key: key});
         //}
 
         if ( options.array ) {
