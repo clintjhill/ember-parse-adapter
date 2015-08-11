@@ -42,9 +42,8 @@ export default DS.RESTAdapter.extend({
   * properties onto existing data so that the record maintains
   * latest data.
   */
-  createRecord: function( store, type, record ) {
+  createRecord: function( store, type, snapshot ) {
     var serializer = store.serializerFor( type.typeKey ),
-      snapshot   = record._createSnapshot(),
       data       = {},
       adapter    = this;
 
@@ -69,10 +68,9 @@ export default DS.RESTAdapter.extend({
   * properties onto existing data so that the record maintains
   * latest data.
   */
-  updateRecord: function(store, type, record) {
+  updateRecord: function(store, type, snapshot) {
     var serializer  = store.serializerFor( type.typeKey ),
-      snapshot    = record._createSnapshot(),
-      id          = record.get( 'id' ),
+      id          = snapshot.id,
       sendDeletes = false,
       deleteds    = {},
       data        = {},
@@ -129,20 +127,22 @@ export default DS.RESTAdapter.extend({
   * Implementation of a hasMany that provides a Relation query for Parse
   * objects.
   */
-  findHasMany: function( store, record, relatedInfo ) {
-    var relatedInfo_ = JSON.parse( relatedInfo ),
+  findHasMany: function( store, snapshot, url/*, relationship */ ) {
+    var relatedInfo_ = JSON.parse( url ),
         query        = {
         where: {
           '$relatedTo': {
             'object': {
               '__type'    : 'Pointer',
-              'className' : this.parseClassName( record.typeKey ),
-              'objectId'  : record.get( 'id' )
+              'className' : this.parseClassName( snapshot.typeKey ),
+              'objectId'  : snapshot.id
             },
             key: relatedInfo_.key
           }
         }
     };
+    
+    
 
     // the request is to the related type and not the type for the record.
     // the query is where there is a pointer to this record.
