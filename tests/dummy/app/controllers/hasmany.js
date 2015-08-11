@@ -21,9 +21,10 @@ export default Ember.Controller.extend({
       var tiger  = this.get( 'model' ),
         stripe = tiger.get( 'stripes' ).createRecord();
 
-      stripe.save().then( function( tiger ) {
+      stripe.save().then( function( stripe ) {
         tiger.save();
       });
     }
+    
   }
 });

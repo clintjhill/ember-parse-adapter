@@ -266,7 +266,7 @@ test( 'Create Record', function( assert ) {
   // Passing comments as an Ember array. This is due to a bug in Ember-Data
   // expecting an Ember array for data and not a raw array:
   // https://github.com/emberjs/data/pull/1939
-  assert.deepEqual( ajaxHash.data, {comments: Ember.A(), title: 'Testing Create'}, 'raw data is posted' );
+  assert.deepEqual( ajaxHash.data, {comments: null, title: 'Testing Create'}, 'raw data is posted' );
 
   ajaxHash.success({
     objectId  : 'created321',
