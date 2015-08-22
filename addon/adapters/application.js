@@ -36,7 +36,7 @@ export default DS.RESTAdapter.extend({
     return Ember.String.capitalize( Ember.String.camelize( type ) );
   },
 
-  parseClassName: function (key ) {
+  parseClassName: function ( key ) {
     return Ember.String.capitalize( Ember.String.camelize( key ) );
   },
 
