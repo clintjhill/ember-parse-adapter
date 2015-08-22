@@ -36,6 +36,10 @@ export default DS.RESTAdapter.extend({
     return Ember.String.capitalize( Ember.String.camelize( type ) );
   },
 
+  parseClassName: function ( key ) {
+    return Ember.String.capitalize( Ember.String.camelize( key ) );
+  },
+
   /**
   * Because Parse doesn't return a full set of properties on the
   * responses to updates, we want to perform a merge of the response
@@ -119,10 +123,6 @@ export default DS.RESTAdapter.extend({
         );
       }
     });
-  },
-
-  parseClassName: function (key ) {
-    return Ember.String.capitalize( key );
   },
 
   /**
