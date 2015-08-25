@@ -25,6 +25,8 @@ export default DS.RESTAdapter.extend({
       return 'users';
     } else if ( 'login' === type ) {
       return 'login';
+    } else if ( 'requestPasswordReset' === type ) {
+      return 'requestPasswordReset';
     } else {
       return this.classesPath + '/' + this.parsePathForType( type );
     }
