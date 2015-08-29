@@ -23,9 +23,14 @@ export default DS.RESTAdapter.extend({
   pathForType: function( type ) {
     if ( 'parseUser' === type || 'parse-user' === type ) {
       return 'users';
-    } else if ( 'login' === type ) {
+    } 
+    else if ( 'login' === type ) {
       return 'login';
-    } else {
+    } 
+    else if ( 'function' === type ) {
+      return 'functions';
+    } 
+    else {
       return this.classesPath + '/' + this.parsePathForType( type );
     }
   },
