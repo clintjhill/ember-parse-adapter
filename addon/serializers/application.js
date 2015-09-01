@@ -162,7 +162,7 @@ export default DS.RESTSerializer.extend({
   },
 
   parseClassName: function(key) {
-    if ('parseUser' === key) {
+    if ('parseUser' === key || 'parse-user' === key) {
       return '_User';
     } else {
       return Ember.String.capitalize(Ember.String.camelize(key));
