@@ -80,6 +80,11 @@ export default DS.RESTAdapter.extend({
       deleteds    = {},
       data        = {},
       adapter     = this;
+    
+    // password cannot be empty
+    if( !data.password && (type.typeKey === 'parseUser' || type.typeKey === 'parse-user') ) {
+      delete data.password;
+    }
 
     serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
 
