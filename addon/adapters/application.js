@@ -80,13 +80,18 @@ export default DS.RESTAdapter.extend({
       deleteds    = {},
       data        = {},
       adapter     = this;
+
+    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
     
     // password cannot be empty
     if( !data.password && (type.typeKey === 'parseUser' || type.typeKey === 'parse-user') ) {
       delete data.password;
     }
-
-    serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
+    
+    // username cannot be empty
+    if( !data.username && (type.typeKey === 'parseUser' || type.typeKey === 'parse-user') ) {
+      delete data.username;
+    }
 
     type.eachRelationship(function( key ) {
       if ( data[key] && data[key].deleteds ) {
