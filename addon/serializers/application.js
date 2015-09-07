@@ -82,7 +82,49 @@ export default DS.RESTSerializer.extend({
       return relationshipHash;
     }
     
-    return { id: coerceId(relationshipHash), type: relationshipModelName };
+    // https://github.com/emberjs/data/blob/v2.0.0/packages/ember-data/lib/system/coerce-id.js
+    var coerceId = relationshipHash == null || relationshipHash === '' ? null : relationshipHash+'';
+    
+    return { id: coerceId, type: relationshipModelName };
+  },
+  
+  extractRelationships: function(modelClass, resourceHash) {    
+    let relationships = {};
+
+    modelClass.eachRelationship(function(key, relationshipMeta) {
+      let relationship = null;
+      let relationshipKey = this.keyForRelationship(key, relationshipMeta.kind, 'deserialize');
+      
+      if (resourceHash.hasOwnProperty(relationshipKey)) {
+        let data = null;
+        let relationshipHash = resourceHash[relationshipKey];
+        
+        if (relationshipMeta.kind === 'belongsTo') {
+          data = this.extractRelationship(relationshipMeta.type, relationshipHash);
+        } 
+        else if (relationshipHash && relationshipMeta.kind === 'hasMany') {
+          // Parse returns the array in relationshipHash.objects
+          data = Ember.A(relationshipHash.objects).map(function(item) {
+            return this.extractRelationship(relationshipMeta.type, item);
+          }, this);
+        }
+        relationship = { data };
+      }
+
+      let linkKey = this.keyForLink(key, relationshipMeta.kind);
+      
+      if (resourceHash.links && resourceHash.links.hasOwnProperty(linkKey)) {
+        let related = resourceHash.links[linkKey];
+        relationship = relationship || {};
+        relationship.links = { related };
+      }
+
+      if (relationship) {
+        relationships[key] = relationship;
+      }
+    }, this);
+
+    return relationships;
   },
 
   serializeIntoHash: function( hash, typeClass, snapshot, options ) {
