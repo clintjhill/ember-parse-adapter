@@ -11,7 +11,7 @@ export default DS.RESTSerializer.extend({
   normalizeArrayResponse: function( store, primaryType, payload ) {
     var namespacedPayload = {};
     namespacedPayload[ Ember.String.pluralize( primaryType.modelName ) ] = payload.results;
-
+    
     return this._super( store, primaryType, namespacedPayload );
   },
 

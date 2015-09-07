@@ -179,7 +179,7 @@ export default DS.RESTAdapter.extend({
   *       }
   *     });
   */
-  findQuery: function ( store, type, query ) {
+  query: function ( store, type, query ) {
     if ( query.where && 'string' !== Ember.typeOf( query.where ) ) {
       query.where = JSON.stringify( query.where );
     }
