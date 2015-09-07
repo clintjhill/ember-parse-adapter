@@ -33,7 +33,7 @@ ParseUser.reopenClass({
         adapter    = store.adapterFor( 'parse-user' ),
         serializer = store.serializerFor( 'parse-user' );
 
-    if ( Ember.isEmpty( this.typeKey ) ) {
+    if ( Ember.isEmpty( this.modelName ) ) {
       throw new Error( 'Parse login must be called on a model fetched via store.modelFor' );
     }
 
@@ -54,11 +54,11 @@ ParseUser.reopenClass({
         adapter    = store.adapterFor('parse-user'),
         serializer = store.serializerFor('parse-user');
 
-    if ( Ember.isEmpty( this.typeKey ) ) {
+    if ( Ember.isEmpty( this.modelName ) ) {
       throw new Error( 'Parse signup must be called on a model fetched via store.modelFor' );
     }
 
-    return adapter.ajax( adapter.buildURL( model.typeKey ), 'POST', { data: data } ).then(
+    return adapter.ajax( adapter.buildURL( model.modelName ), 'POST', { data: data } ).then(
       function( response ) {
         serializer.normalize( model, response );
         response.email = response.email || data.email;

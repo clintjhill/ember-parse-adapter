@@ -2,19 +2,22 @@ import Ember from 'ember';
 import DS from 'ember-data';
 
 export default DS.RESTSerializer.extend({
+  
+  // this will be removed in 2.0
+  isNewSerializerAPI: true,
 
   primaryKey: 'objectId',
 
-  extractArray: function( store, primaryType, payload ) {
+  normalizeArrayResponse: function( store, primaryType, payload ) {
     var namespacedPayload = {};
-    namespacedPayload[ Ember.String.pluralize( primaryType.typeKey ) ] = payload.results;
+    namespacedPayload[ Ember.String.pluralize( primaryType.modelName ) ] = payload.results;
 
     return this._super( store, primaryType, namespacedPayload );
   },
 
-  extractSingle: function( store, primaryType, payload, recordId ) {
+  normalizeSingleResponse: function( store, primaryType, payload, recordId ) {
     var namespacedPayload = {};
-    namespacedPayload[ primaryType.typeKey ] = payload; // this.normalize(primaryType, payload);
+    namespacedPayload[ primaryType.modelName ] = payload; // this.normalize(primaryType, payload);
 
     return this._super( store, primaryType, namespacedPayload, recordId );
   },
@@ -28,12 +31,12 @@ export default DS.RESTSerializer.extend({
   * we have to intercept it here to assure that the adapter knows which
   * record ID we are dealing with (using the primaryKey).
   */
-  extract: function( store, type, payload, id, requestType ) {
+  normalizeResponse: function( store, primaryModelClass, payload, id, requestType ) {
     if( id !== null && ( 'updateRecord' === requestType || 'deleteRecord' === requestType ) ) {
       payload[ this.get( 'primaryKey' ) ] = id;
     }
 
-    return this._super( store, type, payload, id, requestType );
+    return this._super( store, primaryModelClass, payload, id, requestType );
   },
 
   /**
@@ -42,8 +45,8 @@ export default DS.RESTSerializer.extend({
   */
   extractMeta: function( store, type, payload ) {
     if ( payload && payload.count ) {
-      store.setMetadataFor( type, { count: payload.count } );
       delete payload.count;
+      return { count: payload.count };
     }
   },
 
@@ -60,77 +63,29 @@ export default DS.RESTSerializer.extend({
 
     this._super( type, hash );
   },
-
-  /**
-  * Special handling of the Parse relation types. In certain
-  * conditions there is a secondary query to retrieve the "many"
-  * side of the "hasMany".
-  */
-  normalizeRelationships: function( type, hash ) {
-    var store      = this.get('store'),
-      serializer = this;
-
-    type.eachRelationship( function( key, relationship ) {
-
-      var options = relationship.options;
-
-      // Handle the belongsTo relationships
-      if ( hash[key] && 'belongsTo' === relationship.kind ) {
-        hash[key] = hash[key].objectId;
+  
+  extractRelationship: function(relationshipModelName, relationshipHash) {
+    if (Ember.isNone(relationshipHash)) { return null; }
+    /*
+      When `relationshipHash` is an object it usually means that the relationship
+      is polymorphic. It could however also be embedded resources that the
+      EmbeddedRecordsMixin has be able to process.
+    */
+    if (Ember.typeOf(relationshipHash) === 'object') {
+      if (relationshipHash.__type && relationshipHash.__type === 'Pointer') {
+        relationshipHash.id = relationshipHash.objectId;
+        relationshipHash.type = relationshipModelName;
+        delete relationshipHash.objectId;
+        delete relationshipHash.__type;
+        delete relationshipHash.className;
       }
-
-      // Handle the hasMany relationships
-      if ( hash[key] && 'hasMany' === relationship.kind ) {
-
-        // If this is a Relation hasMany then we need to supply
-        // the links property so the adapter can async call the
-        // relationship.
-        // The adapter findHasMany has been overridden to make use of this.
-        //if(options.relation) {
-          // hash[key] contains the response of Parse.com: eg {__type: Relation, className: MyParseClassName}
-          // this is an object that make ember-data fail, as it expects nothing or an array ids that represent the records
-          hash[key] = [];
-
-          // ember-data expects the link to be a string
-          // The adapter findHasMany will parse it
-          if (!hash.links) {
-            hash.links = {};
-          }
-
-          hash.links[key] = JSON.stringify({typeKey: relationship.type, key: key});
-        //}
-
-        if ( options.array ) {
-          // Parse will return [null] for empty relationships
-          if ( hash[key].length && hash[key] ) {
-            hash[key].forEach( function( item, index, items ) {
-              // When items are pointers we just need the id
-              // This occurs when request was made without the include query param.
-              if ( 'Pointer' === item.__type ) {
-                items[index] = item.objectId;
-
-              } else {
-                // When items are objects we need to clean them and add them to the store.
-                // This occurs when request was made with the include query param.
-                delete item.__type;
-                delete item.className;
-                item.id = item.objectId;
-                delete item.objectId;
-                item.type = relationship.type;
-                serializer.normalizeAttributes( relationship.type, item );
-                serializer.normalizeRelationships( relationship.type, item );
-                store.push( relationship.type, item );
-              }
-            });
-          }
-        }
-      }
-    }, this );
-
-    this._super( type, hash );
+      return relationshipHash;
+    }
+    
+    return { id: coerceId(relationshipHash), type: relationshipModelName };
   },
 
-  serializeIntoHash: function( hash, type, snapshot, options ) {
+  serializeIntoHash: function( hash, typeClass, snapshot, options ) {
     Ember.merge( hash, this.serialize( snapshot, options ) );
   },
 
@@ -151,7 +106,7 @@ export default DS.RESTSerializer.extend({
   serializeBelongsTo: function(snapshot, json, relationship) {
     var key         = relationship.key,
         belongsToId = snapshot.belongsTo(key, { id: true });
-
+    
     if (belongsToId) {
       json[key] = {
         '__type'    : 'Pointer',
@@ -193,7 +148,7 @@ export default DS.RESTSerializer.extend({
       hasMany.forEach( function( child ) {
         json[key].objects.push({
           '__type'    : 'Pointer',
-          'className' : _this.parseClassName(child.type.typeKey),
+          'className' : _this.parseClassName(child.type.modelName),
           'objectId'  : child.id
         });
       });

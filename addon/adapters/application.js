@@ -48,14 +48,14 @@ export default DS.RESTAdapter.extend({
   * latest data.
   */
   createRecord: function( store, type, snapshot ) {
-    var serializer = store.serializerFor( type.typeKey ),
+    var serializer = store.serializerFor( type.modelName ),
       data       = {},
       adapter    = this;
 
     serializer.serializeIntoHash( data, type, snapshot, { includeId: true } );
 
     return new Ember.RSVP.Promise( function( resolve, reject ) {
-      adapter.ajax( adapter.buildURL( type.typeKey ), 'POST', { data: data } ).then(
+      adapter.ajax( adapter.buildURL( type.modelName ), 'POST', { data: data } ).then(
         function( json ) {
           var completed = Ember.merge( data, json );
           resolve( completed );
@@ -74,7 +74,7 @@ export default DS.RESTAdapter.extend({
   * latest data.
   */
   updateRecord: function(store, type, snapshot) {
-    var serializer  = store.serializerFor( type.typeKey ),
+    var serializer  = store.serializerFor( type.modelName ),
       id          = snapshot.id,
       sendDeletes = false,
       deleteds    = {},
@@ -84,12 +84,12 @@ export default DS.RESTAdapter.extend({
     serializer.serializeIntoHash(data, type, snapshot, { includeId: true });
     
     // password cannot be empty
-    if( !data.password && (type.typeKey === 'parseUser' || type.typeKey === 'parse-user') ) {
+    if( !data.password && (type.modelName === 'parseUser' || type.modelName === 'parse-user') ) {
       delete data.password;
     }
     
     // username cannot be empty
-    if( !data.username && (type.typeKey === 'parseUser' || type.typeKey === 'parse-user') ) {
+    if( !data.username && (type.modelName === 'parseUser' || type.modelName === 'parse-user') ) {
       delete data.username;
     }
 
@@ -103,9 +103,9 @@ export default DS.RESTAdapter.extend({
 
     return new Ember.RSVP.Promise( function( resolve, reject ) {
       if ( sendDeletes ) {
-        adapter.ajax( adapter.buildURL( type.typeKey, id ), 'PUT', { data: deleteds } ).then(
+        adapter.ajax( adapter.buildURL( type.modelName, id ), 'PUT', { data: deleteds } ).then(
           function() {
-            adapter.ajax( adapter.buildURL( type.typeKey, id ), 'PUT', { data: data } ).then(
+            adapter.ajax( adapter.buildURL( type.modelName, id ), 'PUT', { data: data } ).then(
               function( updates ) {
                 // This is the essential bit - merge response data onto existing data.
                 resolve( Ember.merge( data, updates ) );
@@ -121,7 +121,7 @@ export default DS.RESTAdapter.extend({
         );
 
       } else {
-        adapter.ajax( adapter.buildURL( type.typeKey, id ), 'PUT', { data: data } ).then(
+        adapter.ajax( adapter.buildURL( type.modelName, id ), 'PUT', { data: data } ).then(
           function( json ) {
             // This is the essential bit - merge response data onto existing data.
             resolve( Ember.merge( data, json ) );
@@ -149,7 +149,7 @@ export default DS.RESTAdapter.extend({
           '$relatedTo': {
             'object': {
               '__type'    : 'Pointer',
-              'className' : this.parseClassName( snapshot.typeKey ),
+              'className' : this.parseClassName( snapshot.modelName ),
               'objectId'  : snapshot.id
             },
             key: relatedInfo_.key

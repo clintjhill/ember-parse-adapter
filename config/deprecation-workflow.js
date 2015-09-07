@@ -2,7 +2,7 @@ window.deprecationWorkflow = window.deprecationWorkflow || {};
 window.deprecationWorkflow.config = {
   workflow: [
     { handler: "silence", matchMessage: "Using `Ember.HTMLBars.makeBoundHelper` is deprecated. Please refactor to using `Ember.Helper` or `Ember.Helper.helper`." },
-    { handler: "silence", matchMessage: "Using Ember.HTMLBars._registerHelper is deprecated. Helpers (even dashless ones) are automatically resolved." },
+    { handler: "silence", matchMessage: "Using Ember.HTMLBars._registerHelper is deprecated. Helpers (even dashless ones) are automatically resolved." }/*,
     { handler: "silence", matchMessage: "A container should only be created for an already instantiated registry. For backward compatibility, an isolated registry will be instantiated just for this container." },
     { handler: "silence", matchMessage: "register should be called on the registry instead of the container" },
     { handler: "silence", matchMessage: "injection should be called on the registry instead of the container" },
@@ -19,6 +19,6 @@ window.deprecationWorkflow.config = {
     { handler: "silence", matchMessage: "BuildURLMixin#urlForFindQuery has been deprecated and renamed to `urlForQuery`." },
     { handler: "silence", matchMessage: "store.push(type, data) has been deprecated. Please provide a JSON-API document object as the first and only argument to store.push." },
     { handler: "silence", matchMessage: "Passing classes to store methods has been removed. Please pass a dasherized string instead of undefined" },
-    { handler: "silence", matchMessage: "You are currently using the default DS.RESTAdapter adapter. For Ember 2.0 the default adapter will be DS.JSONAPIAdapter. If you would like to continue using DS.RESTAdapter please create an application adapter that extends DS.RESTAdapter." }
+    { handler: "silence", matchMessage: "You are currently using the default DS.RESTAdapter adapter. For Ember 2.0 the default adapter will be DS.JSONAPIAdapter. If you would like to continue using DS.RESTAdapter please create an application adapter that extends DS.RESTAdapter." }*/
   ]
 };
