@@ -67,7 +67,7 @@ module( 'Unit - adapter:application', {
       post    : DS.belongsTo( 'post', {async: true} )
     }));
 
-    store = container.lookup( 'store:main' );
+    store = container.lookup( 'service:store' );
     adapter = container.lookup( 'adapter:application' );
     serializer = container.lookup( 'serializer:-parse' );
 
@@ -82,7 +82,7 @@ module( 'Unit - adapter:application', {
 
 test( 'find', function( assert ) {
   var post = Ember.run( function() {
-      return store.find( 'post', 'firstPost' );
+      return store.findRecord( 'post', 'firstPost' );
     }),
     isLoaded;
 
@@ -98,7 +98,7 @@ test( 'find', function( assert ) {
   });
 
   assert.ok( get( post, 'isLoaded' ) );
-  assert.ok( !get( post, 'isDirty' ) );
+  assert.ok( !get( post, 'hasDirtyAttributes' ) );
 
   isLoaded = store.recordIsLoaded( 'post', 'firstPost' );
   assert.ok( isLoaded, 'the record is now in the store, and can be looked up by ID without another AJAX request' );
@@ -107,7 +107,7 @@ test( 'find', function( assert ) {
 test( 'find with sessionToken', function( assert ) {
   var post = Ember.run( function() {
       adapter.set( 'sessionToken', 'some-odd-token' );
-      return store.find( 'post', 'firstPost' );
+      return store.findRecord( 'post', 'firstPost' );
     }),
     isLoaded;
 
@@ -122,7 +122,7 @@ test( 'find with sessionToken', function( assert ) {
   });
 
   assert.ok( get(post, 'isLoaded' ) );
-  assert.ok( !get(post, 'isDirty' ) );
+  assert.ok( !get(post, 'hasDirtyAttributes' ) );
 
   isLoaded = store.recordIsLoaded( 'post', 'firstPost' );
   assert.ok( isLoaded, 'the record is now in the store, and can be looked up by ID without another AJAX request' );
@@ -142,7 +142,7 @@ test( 'findAll', function( assert ) {
     post,
     isLoaded;
 
-  posts = store.find( 'post' );
+  posts = store.findAll( 'post' );
 
   assert.expect( ajaxUrl, '/1/classes/Post', 'The Parse API version and classes with Post.' );
   assert.equal( ajaxType, 'GET' );
@@ -165,7 +165,7 @@ test( 'findAll', function( assert ) {
   post = posts.objectAt(0);
 
   assert.ok( get( post, 'isLoaded' ) );
-  assert.ok( !get( post, 'isDirty' ) );
+  assert.ok( !get( post, 'hasDirtyAttributes' ) );
 
   isLoaded = store.recordIsLoaded( 'post', '1' );
 
@@ -178,7 +178,7 @@ QUnit.skip( 'findMany via a hasMany relationship', function( assert ) {
   });
 
   Ember.run( function() {
-    store.find( 'post', 'one' ).then( function( post ) {
+    store.findRecord( 'post', 'one' ).then( function( post ) {
       return get( post, 'comments' );
     }).then( function( comments ) {
       var comment1,
@@ -214,7 +214,7 @@ QUnit.skip( 'findMany via a hasMany relationship', function( assert ) {
 });
 
 test( 'Find Query with non-string where', function( assert ) {
-  var posts = store.find( 'post', {where: {title: 'First Post'}} );
+  var posts = store.query( 'post', {where: {title: 'First Post'}} );
 
   assert.equal( get( posts, 'length' ), 0, 'there are no posts yet as the query has not returned.' );
   assert.expect( ajaxUrl, '/1/classes/Post', 'requests the post class' );
@@ -228,7 +228,7 @@ test( 'Find Query with non-string where', function( assert ) {
 });
 
 test( 'Find Query with where as string', function( assert ){
-  var posts = store.find( 'post', {where: "{title: 'First Post'}"} );
+  var posts = store.query( 'post', {where: "{title: 'First Post'}"} );
 
   assert.equal( get( posts, 'length' ), 0, 'there are no posts yet as the query has not returned.' );
   assert.expect( ajaxUrl, '/1/classes/Post', 'requests the post class' );
@@ -266,7 +266,7 @@ test( 'Create Record', function( assert ) {
   // Passing comments as an Ember array. This is due to a bug in Ember-Data
   // expecting an Ember array for data and not a raw array:
   // https://github.com/emberjs/data/pull/1939
-  assert.deepEqual( ajaxHash.data, {comments: Ember.A(), title: 'Testing Create'}, 'raw data is posted' );
+  assert.deepEqual( ajaxHash.data, {comments: null, title: 'Testing Create'}, 'raw data is posted' );
 
   ajaxHash.success({
     objectId  : 'created321',
@@ -276,7 +276,7 @@ test( 'Create Record', function( assert ) {
   Ember.run( function() {
     promise.then( function() {
       assert.ok( !get( post, 'isSaving'), 'post is not saving after save' );
-      assert.ok( !get( post, 'isDirty'), 'post is not dirty after save' );
+      assert.ok( !get( post, 'hasDirtyAttributes'), 'post is not dirty after save' );
       start();
     });
   });
@@ -284,8 +284,8 @@ test( 'Create Record', function( assert ) {
 
 QUnit.skip( 'Create Record - bulkCommit', function( assert ) {
   var posts = new Ember.Set([
-    store.createRecord(Post, {title: 'Post 1'}),
-    store.createRecord(Post, {title: 'Post 2'})
+    store.createRecord('post', {title: 'Post 1'}),
+    store.createRecord('post', {title: 'Post 2'})
   ]),
   expectStates,
   expectUrl,
@@ -321,16 +321,16 @@ QUnit.skip( 'Create Record - bulkCommit', function( assert ) {
   ]);
 
   expectStates( posts, 'saving', false );
-  expect( posts[0], store.find(Post, 'post1'), 'should match first post.' );
-  expect( posts[1], store.find(Post, 'post2'), 'should match second post.' );
+  expect( posts[0], store.findRecord('post', 'post1'), 'should match first post.' );
+  expect( posts[1], store.findRecord('post', 'post2'), 'should match second post.' );
 });
 
 QUnit.skip( 'Update Record - not bulkCommit', function( assert ) {
-  store.load( Post, {title: 'Test Post Update', objectId: 'postUpdated'} );
+  store.load( 'post', {title: 'Test Post Update', objectId: 'postUpdated'} );
 
   // force it to use single record update
   adapter.bulkCommit = false;
-  var post = store.find( Post, 'postUpdated' ),
+  var post = store.findRecord( 'post', 'postUpdated' ),
   expectState,
   expectUrl,
   expectType,
@@ -350,7 +350,7 @@ QUnit.skip( 'Update Record - not bulkCommit', function( assert ) {
 });
 
 QUnit.skip( 'Update Record - bulkCommit', function( assert ) {
-  store.loadMany(Post, [
+  store.loadMany('post', [
     {objectId: 'post1', title: 'Post 1'},
     {objectId: 'post2', title: 'Post 2'}
   ]);
@@ -390,15 +390,15 @@ QUnit.skip( 'Update Record - bulkCommit', function( assert ) {
   {success: {objectId: 'post2', updatedAt: (new Date()).toISOString()}}
   ]);
   expectStates(posts, 'saving', false);
-  expect(posts[0], store.find(Post, 'post1'), 'should match first post.');
-  expect(posts[1], store.find(Post, 'post2'), 'should match second post.');
+  expect(posts[0], store.findRecord('post', 'post1'), 'should match first post.');
+  expect(posts[1], store.findRecord('post', 'post2'), 'should match second post.');
 });
 
 QUnit.skip( 'Delete Record - not bulkCommit', function( assert ){
-  store.load(Post, {objectId: 'post1', title: 'Post to delete.'});
+  store.load('post', {objectId: 'post1', title: 'Post to delete.'});
   // force single record delete
   adapter.bulkCommit = false;
-  var post = store.find(Post, 'post1'),
+  var post = store.findRecord('post', 'post1'),
   expectState,
   expectUrl,
   expectType;
@@ -418,7 +418,7 @@ QUnit.skip( 'Delete Record - not bulkCommit', function( assert ){
 });
 
 QUnit.skip( 'Delete Record - bulkCommit', function( assert ){
-  store.loadMany(Post, [
+  store.loadMany('post', [
   {objectId: 'post1', title: 'Post 1'},
   {objectId: 'post2', title: 'Post 2'}
   ]);
