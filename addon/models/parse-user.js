@@ -49,22 +49,29 @@ ParseUser.reopenClass({
     );
   },
 
-  signup: function( store, data ) {
+  signup: function(store, data) {
     var model      = this,
         adapter    = store.adapterFor('parse-user'),
         serializer = store.serializerFor('parse-user');
 
-    if ( Ember.isEmpty( this.modelName ) ) {
-      throw new Error( 'Parse signup must be called on a model fetched via store.modelFor' );
+    if (Ember.isEmpty(this.modelName)) {
+      throw new Error('Parse signup must be called on a model fetched via store.modelFor');
     }
 
-    return adapter.ajax( adapter.buildURL( model.modelName ), 'POST', { data: data } ).then(
-      function( response ) {
-        var serialized = serializer.normalize( model, response ),
-            record = store.push( serialized );
+    return adapter.ajax(adapter.buildURL(model.modelName), 'POST', {data: data}).then(
+      function(response) {
+
+        //var serialized = serializer.normalize( model, response ),
+        //    record = store.push( serialized );
+
+        var serialized = serializer.normalize(model, response);
+        Ember.merge(serialized.data.attributes, data);
+        var record = store.push(serialized);
+
         return record;
       },
-      function( response ) {
+      function(response) {
+        console.log(response);
         return Ember.RSVP.reject( response.responseJSON );
       }
     );
