@@ -38,8 +38,6 @@ export default DS.RESTAdapter.extend({
   * latest data.
   */
   createRecord: function( store, type, snapshot ) {
-    console.log('ADAPTER ADAPTER createRecord:');
-
     var serializer = store.serializerFor( type.modelName ),
       data       = {},
       adapter    = this;
@@ -49,11 +47,6 @@ export default DS.RESTAdapter.extend({
     return new Ember.RSVP.Promise( function( resolve, reject ) {
       adapter.ajax( adapter.buildURL( type.modelName ), 'POST', { data: data } ).then(
         function( json ) {
-
-          console.log('Promise: data and json');
-          console.log(data);
-          console.log(json);
-
           var completed = Ember.merge( data, json );
           resolve( completed );
         },
