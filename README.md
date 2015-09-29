@@ -115,5 +115,5 @@ How to use this addon in your application
 -----------------------------------------
 
 ```
-ember install:addon ember-parse-adapter
+ember install ember-parse-adapter
 ```
