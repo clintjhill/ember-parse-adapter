@@ -1,9 +1,12 @@
 import Ember from 'ember';
 import DS from 'ember-data';
 
+/****************************************************************************
+/* PROPERTIES
+/***************************************************************************/
+
 /**
- * Parse User object implementation
- *
+ * Parse User
  * @type {DS.ParseModel}
  */
 var ParseUser = DS.Model.extend({
@@ -15,6 +18,10 @@ var ParseUser = DS.Model.extend({
   createdAt     : DS.attr('date'),
   updatedAt     : DS.attr('date')
 });
+
+/****************************************************************************
+/* ACTIONS
+/***************************************************************************/
 
 ParseUser.reopenClass({
   requestPasswordReset: function(email) {
@@ -29,9 +36,6 @@ ParseUser.reopenClass({
   },
 
   login: function(store, data) {
-    console.log('store');
-    console.log(store);
-
     var model      = this,
         adapter    = store.adapterFor('parse-user'),
         serializer = store.serializerFor('parse-user');
@@ -46,7 +50,7 @@ ParseUser.reopenClass({
             record = store.push(serialized);
         return record;
       },
-      function( response ) {
+      function(response) {
         return Ember.RSVP.reject( response.responseJSON );
       }
     );
