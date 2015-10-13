@@ -146,9 +146,6 @@ export default DS.RESTAdapter.extend({
           }
         }
     };
-
-
-
     // the request is to the related type and not the type for the record.
     // the query is where there is a pointer to this record.
     return this.ajax( this.buildURL( relationship.type ), "GET", { data: query } );
@@ -173,7 +170,6 @@ export default DS.RESTAdapter.extend({
     if ( query.where && 'string' !== Ember.typeOf( query.where ) ) {
       query.where = JSON.stringify( query.where );
     }
-
     // Pass to _super()
     return this._super( store, type, query );
   },

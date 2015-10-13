@@ -51,7 +51,7 @@ ParseUser.reopenClass({
         return record;
       },
       function(response) {
-        return Ember.RSVP.reject( response.responseJSON );
+        return Ember.RSVP.reject(response.responseJSON);
       }
     );
   },
@@ -68,18 +68,15 @@ ParseUser.reopenClass({
     return adapter.ajax(adapter.buildURL(model.modelName), 'POST', {data: data}).then(
       function(response) {
 
-        //var serialized = serializer.normalize( model, response ),
-        //    record = store.push( serialized );
-
         var serialized = serializer.normalize(model, response);
+        // This is the essential bit - merge response data onto existing data.
         Ember.merge(serialized.data.attributes, data);
         var record = store.push(serialized);
 
         return record;
       },
       function(response) {
-        console.log(response);
-        return Ember.RSVP.reject( response.responseJSON );
+        return Ember.RSVP.reject(response.responseJSON);
       }
     );
   }

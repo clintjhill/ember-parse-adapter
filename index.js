@@ -2,8 +2,8 @@
 'use strict';
 
 module.exports = {
-  name: 'ember-parse-adapter',
-  isDevelopingAddon: function() {
-    return true;
-  }
+  name: 'ember-parse-adapter'
+  //isDevelopingAddon: function() {
+  //  return true;
+  //}
 };
