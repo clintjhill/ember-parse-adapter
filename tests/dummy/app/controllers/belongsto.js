@@ -18,15 +18,19 @@ export default Ember.Controller.extend({
 
       donut = this.get( 'model' );
 
-      donut.save().then( function( donut ) {
-        hole.set( 'donut', donut );
-        hole.save().then( function( hole ) {
+      donut.save()
+        .then( function( donutResult ) {
+          hole.set( 'donut', donut );
+          return hole.save();
+        })
+        .then( function( holeResult ) {
           donut.set( 'hole', hole );
-          donut.save().then( function( donut ) {
-            controller.set( 'succeeded', 'true' );
-          });
+          return donut.save();
+        })
+        .then( function( donutResult ) {
+          controller.set( 'succeeded', 'true' );
         });
-      });
+      
     }
   }
 });

@@ -62,7 +62,7 @@ module( 'Unit - model:parse-user', {
       }
     }));
 
-    store = container.lookup( 'store:main' );
+    store = container.lookup( 'service:store' );
     adapter = container.lookup( 'adapter:application' );
     serializer = container.lookup( 'serializer:-parse' );
 
@@ -102,7 +102,7 @@ test( 'Signup', function( assert ) {
   Ember.run( function() {
     promise.then( function( user ) {
       assert.ok( !get( user, 'isSaving'), 'user is not saving' );
-      assert.ok( !get( user, 'isDirty'), 'user is not dirty' );
+      assert.ok( !get( user, 'hasDirtyAttributes'), 'user is not dirty' );
       assert.equal( get( user, 'id'), 'g7y9tkhB7O', 'Be sure objectId is set.' );
       assert.equal( get( user, 'password'), null, 'Be sure that password gets dumped.' );
       assert.equal( get( user, 'sessionToken'), 'pnktnjyb996sj4p156gjtp4im', 'Make sure session token set.' );
@@ -149,7 +149,7 @@ test( 'Signup with Facebook', function( assert ) {
   Ember.run( function() {
     promise.then( function( user ) {
       assert.ok( !get( user, 'isSaving' ), 'user is not saving' );
-      assert.ok( !get( user, 'isDirty' ), 'user is not dirty' );
+      assert.ok( !get( user, 'hasDirtyAttributes' ), 'user is not dirty' );
       assert.equal( get( user, 'id' ), 'g7y9tkhB7O', 'Be sure objectId is set.' );
       assert.equal( get( user, 'password' ), null, 'Be sure that password gets dumped.' );
       assert.equal( get( user, 'sessionToken' ), 'pnktnjyb996sj4p156gjtp4im', 'Make sure session token set.' );
@@ -162,7 +162,7 @@ test( 'Find', function( assert ) {
   var user;
 
   Ember.run( function() {
-    user = store.find( 'parse-user', 'h8mgfgL1yS' );
+    user = store.findRecord( 'parse-user', 'h8mgfgL1yS' );
   });
 
   assert.ok( !get( user, 'isLoaded' ) );
@@ -217,9 +217,9 @@ QUnit.skip( 'Password Reset Request', function( assert ) {
   expectType,
   expectUrl;
 
-  store.load( User, {objectId: 'aid8nalX'} );
+  store.load( 'parse-user', {objectId: 'aid8nalX'} );
 
-  user = store.find( User, 'aid8nalX' );
+  user = store.findRecord( 'parse-user', 'aid8nalX' );
 
   // expected events
   user.on( 'requestingPasswordReset', function() {
@@ -248,13 +248,13 @@ QUnit.skip( 'Update (batch) - Session token handling', function( assert ) {
     User,
     expectState;
 
-  store.loadMany( User, [
+  store.loadMany( 'parse-user', [
     {objectId: 'xuF8hlkrg', username: 'clintjhill', email: 'nope@yep.com'},
     {objectId: 'inol8HFer', username: 'clinthill', email: 'yep@nope.com', sessionToken: 'ivegotasession'}
   ]);
 
-  allowsUpdate = store.find( User, 'inol8HFer' );
-  noUpdates = store.find( User, 'xuF8hlkrg' );
+  allowsUpdate = store.findRecord( 'parse-user', 'inol8HFer' );
+  noUpdates = store.findRecord( 'parse-user', 'xuF8hlkrg' );
 
   allowsUpdate.set( 'password', 'notHacked' );
   noUpdates.set( 'password', 'youGotHacked' );

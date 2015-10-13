@@ -22,7 +22,7 @@ module( 'Unit - serializer:application', {
   beforeEach: function() {
     container  = buildContainer();
     serializer = container.lookup( 'serializer:-parse' );
-    store      = container.lookup( 'store:main' );
+    store      = container.lookup( 'service:store' );
 
     container.register( 'model:post', DS.Model.extend({
       title    : DS.attr( 'string' ),
@@ -53,10 +53,10 @@ test( 'Requires objectId as key', function( assert ) {
 test( 'A single post is extracted', function( assert ) {
   var id    = 'test',
     title = 'Test rooting',
-    res   = serializer.extractSingle( store, Post, {objectId: id, title: title}, id );
+    res   = serializer.normalizeSingleResponse( store, Post, {objectId: id, title: title}, id );
 
-  assert.equal( res.id, id, 'objectId should be put on post namespace' );
-  assert.equal( res.title, title, 'Title should be put on post namespace' );
+  assert.equal( res.data.id, id, 'objectId should be put on post namespace' );
+  assert.equal( res.data.attributes.title, title, 'Title should be put on post namespace' );
 });
 
 test( 'Many posts are extracted', function( assert ) {
@@ -67,15 +67,15 @@ test( 'Many posts are extracted', function( assert ) {
       objectId: 'testB',
       title: 'Test B'
     }],
-    res = store.serializerFor( Post ).extractArray( store, Post, { results: array } );
+    res = store.serializerFor( 'post' ).normalizeArrayResponse( store, Post, { results: array } );
 
-  assert.equal( res.length, 2, 'normalized array of posts' );
+  assert.equal( res.data.length, 2, 'normalized array of posts' );
 
-  assert.equal( res[0].id, 'testA', 'objectId should be put on post namespace' );
-  assert.equal( res[0].title, 'Test A', 'Title should be put on post namespace' );
+  assert.equal( res.data[0].id, 'testA', 'objectId should be put on post namespace' );
+  assert.equal( res.data[0].attributes.title, 'Test A', 'Title should be put on post namespace' );
 
-  assert.equal( res[1].id, 'testB', 'objectId should be put on post namespace' );
-  assert.equal( res[1].title, 'Test B', 'Title should be put on post namespace' );
+  assert.equal( res.data[1].id, 'testB', 'objectId should be put on post namespace' );
+  assert.equal( res.data[1].attributes.title, 'Test B', 'Title should be put on post namespace' );
 });
 
 QUnit.skip( 'hasMany for serialization (Parse Pointer)', function( assert ) {
@@ -85,10 +85,10 @@ QUnit.skip( 'hasMany for serialization (Parse Pointer)', function( assert ) {
     post,
     comment;
 
-  store.load( Post, '1', {title: 'Testing hasMany serialization.'} );
-  store.load( Comment, '1', {content: 'Comment 1'} );
-  post = store.find(Post, '1');
-  comment = store.find(Comment, '1');
+  store.load( 'post', '1', {title: 'Testing hasMany serialization.'} );
+  store.load( 'comment', '1', {content: 'Comment 1'} );
+  post = store.findRecord('post', '1');
+  comment = store.findRecord('comment', '1');
   post.get( 'comments').pushObject( comment );
   serializer.addHasMany( hash, post, 'comments', relationship );
 
