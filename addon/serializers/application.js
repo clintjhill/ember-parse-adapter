@@ -191,7 +191,7 @@ export default DS.RESTSerializer.extend({
         json[key].objects.push({
           '__type'    : 'Pointer',
           'className' : _this.parseClassName(child.type.typeKey),
-          'objectId'  : child.attr( 'id' )
+          'objectId'  : child.id
         });
       });
 
